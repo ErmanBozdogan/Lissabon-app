@@ -32,8 +32,12 @@ function JoinPageInner() {
       const response = await fetch('/api/auth/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), password: password.trim() }),
+        body: JSON.stringify({
+          name: name.trim(),
+          password,
+        }),
       });
+      
 
       if (response.ok) {
         const data = await response.json();
