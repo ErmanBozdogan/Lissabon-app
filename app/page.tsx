@@ -71,6 +71,18 @@ function HomePageInner() {
   const [isLoading, setIsLoading] = useState(true);
   // Store activities in state, initialized from localStorage
   const [activities, setActivities] = useState<Activity[]>([]);
+  
+  // Temporary debug banner
+  const [origin, setOrigin] = useState<string>('');
+  const [hasActivities, setHasActivities] = useState<boolean>(false);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setOrigin(window.location.origin);
+      const stored = localStorage.getItem('trip_activities');
+      setHasActivities(!!stored);
+    }
+  }, [activities]);
 
   // Fetch static trip data (structure only, no activities)
   const { data: staticTripData, error, mutate } = useSWR<TripData>(
@@ -244,7 +256,9 @@ useEffect(() => {
 
     // Update state and localStorage
     setActivities(updatedActivities);
-    saveActivitiesToStorage(updatedActivities);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('trip_activities', JSON.stringify(updatedActivities));
+    }
   };
 
   const handleEditActivity = async (activityId: string, updates: Partial<Activity>): Promise<void> => {
@@ -275,7 +289,9 @@ useEffect(() => {
 
     // Update state and localStorage
     setActivities(updatedActivities);
-    saveActivitiesToStorage(updatedActivities);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('trip_activities', JSON.stringify(updatedActivities));
+    }
   };
 
   const handleDeleteActivity = async (activityId: string): Promise<void> => {
@@ -299,16 +315,27 @@ useEffect(() => {
 
     // Update state and localStorage
     setActivities(updatedActivities);
-    saveActivitiesToStorage(updatedActivities);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('trip_activities', JSON.stringify(updatedActivities));
+    }
   };
 
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        {origin && (
+          <div className="bg-yellow-100 dark:bg-yellow-900 border-b border-yellow-300 dark:border-yellow-700 px-4 py-2 text-xs text-yellow-800 dark:text-yellow-200">
+            <div className="max-w-2xl mx-auto">
+              <strong>Origin:</strong> {origin} | <strong>trip_activities exists:</strong> {hasActivities ? 'YES' : 'NO'}
+            </div>
+          </div>
+        )}
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          </div>
         </div>
       </div>
     );
@@ -316,20 +343,29 @@ useEffect(() => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Lisbon Trip Planner
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            This is a private trip planning app. Enter the password to access.
-          </p>
-          <button
-            onClick={() => router.push('/join')}
-            className="w-full bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2.5 px-4 rounded-xl transition-all duration-200 shadow-sm hover:shadow"
-          >
-            Enter Password
-          </button>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        {origin && (
+          <div className="bg-yellow-100 dark:bg-yellow-900 border-b border-yellow-300 dark:border-yellow-700 px-4 py-2 text-xs text-yellow-800 dark:text-yellow-200">
+            <div className="max-w-2xl mx-auto">
+              <strong>Origin:</strong> {origin} | <strong>trip_activities exists:</strong> {hasActivities ? 'YES' : 'NO'}
+            </div>
+          </div>
+        )}
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              Lisbon Trip Planner
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              This is a private trip planning app. Enter the password to access.
+            </p>
+            <button
+              onClick={() => router.push('/join')}
+              className="w-full bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2.5 px-4 rounded-xl transition-all duration-200 shadow-sm hover:shadow"
+            >
+              Enter Password
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -337,15 +373,24 @@ useEffect(() => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <p className="text-red-600 dark:text-red-400 mb-4">Failed to load trip data</p>
-          <button
-            onClick={() => mutate()}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md"
-          >
-            Retry
-          </button>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        {origin && (
+          <div className="bg-yellow-100 dark:bg-yellow-900 border-b border-yellow-300 dark:border-yellow-700 px-4 py-2 text-xs text-yellow-800 dark:text-yellow-200">
+            <div className="max-w-2xl mx-auto">
+              <strong>Origin:</strong> {origin} | <strong>trip_activities exists:</strong> {hasActivities ? 'YES' : 'NO'}
+            </div>
+          </div>
+        )}
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <p className="text-red-600 dark:text-red-400 mb-4">Failed to load trip data</p>
+            <button
+              onClick={() => mutate()}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md"
+            >
+              Retry
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -353,10 +398,19 @@ useEffect(() => {
 
   if (!tripData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading trip data...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        {origin && (
+          <div className="bg-yellow-100 dark:bg-yellow-900 border-b border-yellow-300 dark:border-yellow-700 px-4 py-2 text-xs text-yellow-800 dark:text-yellow-200">
+            <div className="max-w-2xl mx-auto">
+              <strong>Origin:</strong> {origin} | <strong>trip_activities exists:</strong> {hasActivities ? 'YES' : 'NO'}
+            </div>
+          </div>
+        )}
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Loading trip data...</p>
+          </div>
         </div>
       </div>
     );
@@ -364,6 +418,14 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20">
+      {/* Temporary debug banner */}
+      {origin && (
+        <div className="bg-yellow-100 dark:bg-yellow-900 border-b border-yellow-300 dark:border-yellow-700 px-4 py-2 text-xs text-yellow-800 dark:text-yellow-200">
+          <div className="max-w-2xl mx-auto">
+            <strong>Origin:</strong> {origin} | <strong>trip_activities exists:</strong> {hasActivities ? 'YES' : 'NO'}
+          </div>
+        </div>
+      )}
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* Header with Background Image */}
         <div className="relative rounded-2xl shadow-lg mb-8 sticky top-4 z-10 overflow-hidden min-h-[280px]">
