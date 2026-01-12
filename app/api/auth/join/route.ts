@@ -9,20 +9,25 @@ export async function POST(request: NextRequest) {
   try {
     const { name, password } = await request.json();
 
+
     if (!name || !password) {
       return NextResponse.json(
         { error: 'Name and password are required' },
         { status: 400 }
       );
     }
+    
+
+
 
     // Verify password
-    if (password !== TRIP_PASSWORD) {
+    if (password.trim() !== TRIP_PASSWORD) {
       return NextResponse.json(
         { error: 'Invalid password' },
         { status: 401 }
       );
     }
+    
 
     const tripData = getTripData();
 
