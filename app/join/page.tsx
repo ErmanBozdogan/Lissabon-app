@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function JoinPage() {
+function JoinPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [name, setName] = useState('');
@@ -110,5 +110,12 @@ export default function JoinPage() {
         </form>
       </div>
     </div>
+  );
+}
+export default function JoinPage() {
+  return (
+    <Suspense fallback={null}>
+      <JoinPageInner />
+    </Suspense>
   );
 }

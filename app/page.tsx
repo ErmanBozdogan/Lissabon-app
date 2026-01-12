@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TripData, Activity, User } from '@/types';
 import DaySection from '@/components/DaySection';
@@ -42,7 +42,7 @@ const fetcher = async (url: string) => {
   }
 };
 
-export default function Home() {
+function HomePageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [user, setUser] = useState<User | null>(null);
@@ -507,5 +507,12 @@ export default function Home() {
         ))}
       </div>
     </div>
+  );
+}
+export default function Page() {
+  return (
+    <Suspense fallback={null}>
+      <HomePageInner />
+    </Suspense>
   );
 }
