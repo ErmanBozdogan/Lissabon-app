@@ -5,41 +5,43 @@ import { useRouter } from 'next/navigation';
 import { TripData, Activity, User } from '@/types';
 import DaySection from '@/components/DaySection';
 import useSWR from 'swr';
-import {
-  saveToLocalStorage,
-  loadFromLocalStorage,
-  queueOfflineAction,
-  syncOfflineQueue,
-} from '@/lib/offline-sync';
+// Client-only activity storage in localStorage
+const ACTIVITIES_STORAGE_KEY = 'trip_activities';
+
+const loadActivitiesFromStorage = (): Activity[] => {
+  try {
+    const stored = localStorage.getItem(ACTIVITIES_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error('Error loading activities from localStorage:', error);
+  }
+  return [];
+};
+
+const saveActivitiesToStorage = (activities: Activity[]): void => {
+  try {
+    localStorage.setItem(ACTIVITIES_STORAGE_KEY, JSON.stringify(activities));
+  } catch (error) {
+    console.error('Error saving activities to localStorage:', error);
+  }
+};
 
 const fetcher = async (url: string) => {
-  try {
-    const token = localStorage.getItem('auth_token');
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-    
-    const response = await fetch(url, { headers });
-    if (!response.ok) {
-      // If offline, try to load from cache
-      if (!navigator.onLine) {
-        const cached = loadFromLocalStorage();
-        if (cached) return cached;
-      }
-      throw new Error('Failed to fetch');
-    }
-    const data = await response.json();
-    saveToLocalStorage(data);
-    return data;
-  } catch (error) {
-    // Try to load from cache on error
-    const cached = loadFromLocalStorage();
-    if (cached) return cached;
-    throw error;
+  const token = localStorage.getItem('auth_token');
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
+  
+  const response = await fetch(url, { headers });
+  if (!response.ok) {
+    throw new Error('Failed to fetch');
+  }
+  return response.json();
 };
 
 function HomePageInner() {
@@ -47,44 +49,34 @@ function HomePageInner() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch trip data with auto-refresh
-  const { data: tripData, error, mutate } = useSWR<TripData>(
+  // Fetch static trip data (structure only, no activities)
+  const { data: staticTripData, error, mutate } = useSWR<TripData>(
     user ? '/api/trip' : null,
     fetcher,
     {
-      refreshInterval: 3000, // Refresh every 3 seconds for near real-time updates
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
+      refreshInterval: 0, // No auto-refresh needed for static data
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
     }
   );
+
+  // Merge static trip data with localStorage activities
+  const tripData: TripData | undefined = staticTripData ? {
+    ...staticTripData,
+    activities: loadActivitiesFromStorage(),
+  } : undefined;
 
   useEffect(() => {
     checkAuth();
   }, []);
 
+  // Trigger re-render when activities change (for UI updates)
   useEffect(() => {
-    if (!user) return;
-    
-    // Set up offline sync
-    const handleOnline = () => {
-      syncOfflineQueue().then(() => {
-        mutate();
-      });
-    };
-    
-    window.addEventListener('online', handleOnline);
-    
-    // Sync on mount if online
-    if (navigator.onLine) {
-      syncOfflineQueue().then(() => {
-        mutate();
-      });
+    if (user && staticTripData) {
+      // Force re-render to update tripData with latest activities
+      mutate();
     }
-    
-    return () => {
-      window.removeEventListener('online', handleOnline);
-    };
-  }, [user, mutate]);
+  }, [user, staticTripData, mutate]);
 
 
   const checkAuth = async () => {
@@ -148,172 +140,138 @@ function HomePageInner() {
   };
 
 
-  const handleAddActivity = async (activity: Partial<Activity>) => {
-    try {
-      if (!navigator.onLine) {
-        // Queue for offline sync
-        queueOfflineAction({
-          type: 'add_activity',
-          payload: activity,
-          timestamp: Date.now(),
-        });
-        // Optimistically update local cache
-        const cached = loadFromLocalStorage();
-        if (cached) {
-          const optimisticActivity: Activity = {
-            id: `temp-${Date.now()}`,
-            title: activity.title!,
-            description: activity.description,
-            location: activity.location,
-            day: activity.day!,
-            creatorId: user!.id,
-            creatorName: user!.name,
-            createdAt: new Date().toISOString(),
-            votes: [],
-            category: activity.category,
-          };
-          cached.activities.push(optimisticActivity);
-          saveToLocalStorage(cached);
-          mutate(cached, false);
-        }
-        return;
-      }
-
-      const token = localStorage.getItem('auth_token');
-      const response = await fetch('/api/activities', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(activity),
-      });
-
-      if (response.ok) {
-        mutate(); // Refresh trip data
-      } else {
-        throw new Error('Failed to add activity');
-      }
-    } catch (error) {
-      console.error('Error adding activity:', error);
-      // Queue for offline sync
-      queueOfflineAction({
-        type: 'add_activity',
-        payload: activity,
-        timestamp: Date.now(),
-      });
-      alert('Failed to add activity. It will be synced when online.');
-      throw error;
+  const handleAddActivity = async (activity: Partial<Activity>): Promise<void> => {
+    if (!user || !activity.title || !activity.day) {
+      return;
     }
+
+    // Create new activity object
+    const newActivity: Activity = {
+      id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      title: activity.title,
+      description: activity.description,
+      location: activity.location,
+      day: activity.day,
+      creatorId: user.id,
+      creatorName: user.name,
+      createdAt: new Date().toISOString(),
+      votes: [],
+      category: activity.category,
+    };
+
+    // Load existing activities from localStorage
+    const existingActivities = loadActivitiesFromStorage();
+    
+    // Add new activity
+    const updatedActivities = [...existingActivities, newActivity];
+    
+    // Save to localStorage
+    saveActivitiesToStorage(updatedActivities);
+    
+    // Update UI immediately by triggering a re-render
+    // The tripData will be recalculated on next render with updated activities
+    mutate();
   };
 
-  const handleVote = async (activityId: string, vote: 'yes' | 'no') => {
-    try {
-      const currentVote = tripData?.activities.find(a => a.id === activityId)?.votes.find(v => v.userId === user?.id);
-      
-      if (!navigator.onLine) {
-        // Queue for offline sync
-        queueOfflineAction({
-          type: 'vote',
-          payload: { activityId, vote },
-          timestamp: Date.now(),
-        });
-        // Optimistically update local cache
-        const cached = loadFromLocalStorage();
-        if (cached) {
-          const activity = cached.activities.find(a => a.id === activityId);
-          if (activity) {
-            activity.votes = activity.votes.filter(v => v.userId !== user!.id);
-            if (currentVote?.vote !== vote) {
-              activity.votes.push({ userId: user!.id, userName: user!.name, vote });
-            }
-            saveToLocalStorage(cached);
-            mutate(cached, false);
-          }
-        }
-        return;
-      }
-      
-      const token = localStorage.getItem('auth_token');
-      const headers = {
-        'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-      };
-      
-      // If clicking the same vote, remove it
-      if (currentVote?.vote === vote) {
-        const response = await fetch(`/api/votes?activityId=${activityId}`, {
-          method: 'DELETE',
-          headers,
-        });
-        if (response.ok) {
-          mutate();
-        }
-      } else {
-        const response = await fetch('/api/votes', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ activityId, vote }),
-        });
-        if (response.ok) {
-          mutate();
-        }
-      }
-    } catch (error) {
-      console.error('Error voting:', error);
-      // Queue for offline sync
-      queueOfflineAction({
-        type: 'vote',
-        payload: { activityId, vote },
-        timestamp: Date.now(),
-      });
+  const handleVote = async (activityId: string, vote: 'yes' | 'no'): Promise<void> => {
+    if (!user || !tripData) return;
+
+    // Load existing activities from localStorage
+    const existingActivities = loadActivitiesFromStorage();
+    
+    // Find the activity
+    const activityIndex = existingActivities.findIndex(a => a.id === activityId);
+    if (activityIndex === -1) {
+      console.error('Activity not found');
+      return;
     }
+
+    const activity = existingActivities[activityIndex];
+    const currentVote = activity.votes.find(v => v.userId === user.id);
+
+    // If clicking the same vote, remove it
+    if (currentVote?.vote === vote) {
+      activity.votes = activity.votes.filter(v => v.userId !== user.id);
+    } else {
+      // Remove existing vote and add new one
+      activity.votes = activity.votes.filter(v => v.userId !== user.id);
+      activity.votes.push({ userId: user.id, userName: user.name, vote });
+    }
+
+    // Update the activities array
+    const updatedActivities = [...existingActivities];
+    updatedActivities[activityIndex] = activity;
+
+    // Save to localStorage
+    saveActivitiesToStorage(updatedActivities);
+
+    // Update UI immediately
+    mutate();
   };
 
-  const handleEditActivity = async (activityId: string, updates: Partial<Activity>) => {
-    try {
-      const token = localStorage.getItem('auth_token');
-      const response = await fetch(`/api/activities/${activityId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(updates),
-      });
+  const handleEditActivity = async (activityId: string, updates: Partial<Activity>): Promise<void> => {
+    if (!user) return;
 
-      if (response.ok) {
-        mutate(); // Refresh trip data
-      } else {
-        throw new Error('Failed to update activity');
-      }
-    } catch (error) {
-      console.error('Error updating activity:', error);
-      alert('Failed to update activity');
-      throw error;
+    // Load existing activities from localStorage
+    const existingActivities = loadActivitiesFromStorage();
+    
+    // Find and update the activity
+    const activityIndex = existingActivities.findIndex(a => a.id === activityId);
+    if (activityIndex === -1) {
+      console.error('Activity not found');
+      return;
     }
+
+    // Only creator can edit
+    if (existingActivities[activityIndex].creatorId !== user.id) {
+      console.error('Only creator can edit activity');
+      return;
+    }
+
+    // Update the activity
+    const updatedActivity = {
+      ...existingActivities[activityIndex],
+      ...updates,
+    };
+
+    // Update the activities array
+    const updatedActivities = [...existingActivities];
+    updatedActivities[activityIndex] = updatedActivity;
+
+    // Save to localStorage
+    saveActivitiesToStorage(updatedActivities);
+
+    // Update UI immediately
+    mutate();
   };
 
-  const handleDeleteActivity = async (activityId: string) => {
-    try {
-      const token = localStorage.getItem('auth_token');
-      const response = await fetch(`/api/activities/${activityId}`, {
-        method: 'DELETE',
-        headers: token ? {
-          'Authorization': `Bearer ${token}`,
-        } : {},
-      });
+  const handleDeleteActivity = async (activityId: string): Promise<void> => {
+    if (!user) return;
 
-      if (response.ok) {
-        mutate(); // Refresh trip data
-      } else {
-        throw new Error('Failed to delete activity');
-      }
-    } catch (error) {
-      console.error('Error deleting activity:', error);
-      alert('Failed to delete activity');
-      throw error;
+    // Load existing activities from localStorage
+    const existingActivities = loadActivitiesFromStorage();
+    
+    // Find the activity
+    const activity = existingActivities.find(a => a.id === activityId);
+    if (!activity) {
+      console.error('Activity not found');
+      return;
     }
+
+    // Only creator can delete
+    if (activity.creatorId !== user.id) {
+      console.error('Only creator can delete activity');
+      return;
+    }
+
+    // Remove the activity
+    const updatedActivities = existingActivities.filter(a => a.id !== activityId);
+
+    // Save to localStorage
+    saveActivitiesToStorage(updatedActivities);
+
+    // Update UI immediately
+    mutate();
   };
 
 
