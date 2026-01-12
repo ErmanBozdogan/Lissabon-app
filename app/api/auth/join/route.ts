@@ -78,9 +78,10 @@ export async function POST(request: NextRequest) {
     // This is a temporary fix for Vercel serverless functions
     const trimmedName = name.trim();
     const userToken = uuidv4();
+    const userId = uuidv4();
     
     const user = {
-      id: uuidv4(),
+      id: userId,
       name: trimmedName,
       token: userToken,
       joinedAt: new Date().toISOString(),

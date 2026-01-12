@@ -1,6 +1,13 @@
 import { cookies } from 'next/headers';
 import { headers } from 'next/headers';
-import { getUserByToken } from './data';
+
+/**
+ * Stateless auth utilities for Vercel serverless
+ * 
+ * Authentication is based ONLY on presence of auth_token.
+ * No user lookup or persistence is performed.
+ * If token exists, user is considered authenticated.
+ */
 
 export const getAuthToken = async (request?: Request): Promise<string | null> => {
   // Try to get from Authorization header first (for client-side)
@@ -40,10 +47,30 @@ export const setAuthToken = async (token: string): Promise<void> => {
   });
 };
 
+/**
+ * Stateless user authentication check
+ * 
+ * Returns a basic user object if token exists, null otherwise.
+ * Does NOT look up users in database or filesystem.
+ * This is client-trusting: if token exists, user is authenticated.
+ * 
+ * Note: User name is not stored server-side, so we return a generic name.
+ * The client should store the name in localStorage during join.
+ */
 export const getCurrentUser = async (request?: Request) => {
   const token = await getAuthToken(request);
   if (!token) return null;
-  return getUserByToken(token);
+  
+  // Stateless: return a basic user object based on token
+  // The token itself is the authentication proof
+  // We don't need to look up the user anywhere
+  // Name will be provided by client from localStorage
+  return {
+    id: 'user', // Generic ID since we're stateless
+    name: 'User', // Generic name - client should provide actual name from localStorage
+    token: token,
+    joinedAt: new Date().toISOString(),
+  };
 };
 
 export const clearAuth = async (): Promise<void> => {

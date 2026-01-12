@@ -79,6 +79,14 @@ function JoinPageInner() {
         
         if (data.user && data.user.token) {
           localStorage.setItem('auth_token', data.user.token);
+          // Store user name if provided (for display purposes)
+          if (data.user.name) {
+            localStorage.setItem('user_name', data.user.name);
+          }
+          // Store user ID if provided
+          if (data.user.id) {
+            localStorage.setItem('user_id', data.user.id);
+          }
           router.push('/');
         } else {
           setError('Invalid response from server');

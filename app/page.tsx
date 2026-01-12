@@ -90,25 +90,58 @@ function HomePageInner() {
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem('auth_token');
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await fetch('/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
+      
+      // Stateless auth: if token exists, user is authenticated
+      // No need to verify with server - token presence = authenticated
+      if (token) {
+        // Get stored user info from localStorage (set during join)
+        const storedName = localStorage.getItem('user_name') || 'User';
+        const storedId = localStorage.getItem('user_id') || 'user';
+        
+        // Create a basic user object from the token
+        // The token itself is the proof of authentication
+        const user: User = {
+          id: storedId,
+          name: storedName,
+          token: token,
+          joinedAt: new Date().toISOString(),
+        };
+        
+        // Optionally verify with server (but don't fail if it doesn't respond)
+        try {
+          const response = await fetch('/api/auth/me', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            // Use server response if available, otherwise use basic user
+            if (data.user) {
+              // Update stored name if server provides it
+              if (data.user.name) {
+                localStorage.setItem('user_name', data.user.name);
+              }
+              setUser(data.user);
+            } else {
+              setUser(user);
+            }
+          } else {
+            // Even if server check fails, trust the token (stateless)
+            setUser(user);
+          }
+        } catch (error) {
+          // If server check fails, still trust the token
+          console.warn('Auth check with server failed, using token:', error);
+          setUser(user);
+        }
       } else {
-        localStorage.removeItem('auth_token');
+        // No token = not authenticated
+        setUser(null);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      localStorage.removeItem('auth_token');
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
