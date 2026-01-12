@@ -1,8 +1,15 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
+/**
+ * Password-based authentication flow:
+ * 1. User enters name and password
+ * 2. Frontend sends exactly: { name: string, password: string }
+ * 3. Backend validates password and creates/returns user
+ * 4. Frontend stores auth token and redirects to main app
+ */
 function JoinPageInner() {
   const router = useRouter();
   const [name, setName] = useState('');
@@ -20,7 +27,12 @@ function JoinPageInner() {
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !password.trim()) {
+    
+    // Validate inputs (trim for validation, but send trimmed values)
+    const trimmedName = name.trim();
+    const trimmedPassword = password.trim();
+    
+    if (!trimmedName || !trimmedPassword) {
       setError('Name and password are required');
       return;
     }
@@ -29,15 +41,16 @@ function JoinPageInner() {
     setError('');
 
     try {
+      // Send exactly: { name: string, password: string }
+      // Both values are trimmed on frontend before sending
       const response = await fetch('/api/auth/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: name.trim(),
-          password,
+          name: trimmedName,
+          password: trimmedPassword,
         }),
       });
-      
 
       if (response.ok) {
         const data = await response.json();

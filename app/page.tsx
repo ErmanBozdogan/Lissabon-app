@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { TripData, Activity, User } from '@/types';
 import DaySection from '@/components/DaySection';
 import useSWR from 'swr';
