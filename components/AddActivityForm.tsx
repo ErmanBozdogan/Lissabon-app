@@ -16,7 +16,7 @@ export default function AddActivityForm({ day, onSubmit, onCancel }: AddActivity
   const [category, setCategory] = useState<Activity['category']>('other');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!title.trim()) return;
 
@@ -35,7 +35,6 @@ export default function AddActivityForm({ day, onSubmit, onCancel }: AddActivity
       setCategory('other');
     } catch (error) {
       console.error('Error adding activity:', error);
-      throw error;
     } finally {
       setIsSubmitting(false);
     }

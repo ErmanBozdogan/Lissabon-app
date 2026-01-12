@@ -75,7 +75,19 @@ export async function POST(request: NextRequest) {
   const updatedActivities = [...existingActivities, newActivity];
   await kv.set(ACTIVITIES_KEY, updatedActivities);
 
-  return new Response(JSON.stringify({ activities: updatedActivities }), {
+  // Verify persistence by reading back from KV
+  const verifiedActivities = await kv.get<Activity[]>(ACTIVITIES_KEY);
+  if (!verifiedActivities || verifiedActivities.length !== updatedActivities.length) {
+    return new Response(JSON.stringify({ error: 'Failed to persist activity' }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store',
+      },
+    });
+  }
+
+  return new Response(JSON.stringify({ activities: verifiedActivities }), {
     headers: {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-store',
