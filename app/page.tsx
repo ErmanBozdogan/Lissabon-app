@@ -42,7 +42,7 @@ function HomePageInner() {
 
   // Fetch activities from API
   const { data: activitiesData, mutate: mutateActivities } = useSWR<{ activities: Activity[] }>(
-    user ? '/api/activities/list' : null,
+    user ? '/api/activities' : null,
     fetcher,
     {
       refreshInterval: 3000,
@@ -155,11 +155,17 @@ function HomePageInner() {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'Failed to add activity' }));
+      console.error('Failed to add activity:', errorData.error || 'Unknown error');
       throw new Error(errorData.error || 'Failed to add activity');
     }
 
-    // Refetch activities from KV after successful write
-    await mutateActivities(undefined, { revalidate: true });
+    // Use the returned activities to update React state
+    const data = await response.json();
+    if (data.activities) {
+      setActivities(data.activities);
+      // Update SWR cache with the new data
+      mutateActivities({ activities: data.activities }, false);
+    }
   };
 
   const handleVote = async (activityId: string, vote: 'yes' | 'no'): Promise<void> => {
@@ -177,7 +183,14 @@ function HomePageInner() {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
       if (response.ok) {
-        await mutateActivities(undefined, { revalidate: true });
+        const data = await response.json();
+        if (data.activity) {
+          // Refetch activities to get updated list
+          await mutateActivities();
+        }
+      } else {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to vote' }));
+        console.error('Failed to vote:', errorData.error || 'Unknown error');
       }
     } else {
       const response = await fetch('/api/votes', {
@@ -189,7 +202,14 @@ function HomePageInner() {
         body: JSON.stringify({ activityId, vote }),
       });
       if (response.ok) {
-        await mutateActivities(undefined, { revalidate: true });
+        const data = await response.json();
+        if (data.activity) {
+          // Refetch activities to get updated list
+          await mutateActivities();
+        }
+      } else {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to vote' }));
+        console.error('Failed to vote:', errorData.error || 'Unknown error');
       }
     }
   };
@@ -208,9 +228,11 @@ function HomePageInner() {
     });
 
     if (response.ok) {
-      mutateActivities();
+      await mutateActivities();
     } else {
-      throw new Error('Failed to update activity');
+      const errorData = await response.json().catch(() => ({ error: 'Failed to update activity' }));
+      console.error('Failed to update activity:', errorData.error || 'Unknown error');
+      throw new Error(errorData.error || 'Failed to update activity');
     }
   };
 
@@ -224,9 +246,11 @@ function HomePageInner() {
     });
 
     if (response.ok) {
-      mutateActivities();
+      await mutateActivities();
     } else {
-      throw new Error('Failed to delete activity');
+      const errorData = await response.json().catch(() => ({ error: 'Failed to delete activity' }));
+      console.error('Failed to delete activity:', errorData.error || 'Unknown error');
+      throw new Error(errorData.error || 'Failed to delete activity');
     }
   };
 

@@ -4,6 +4,28 @@ import { getActivities, saveActivities } from '@/lib/kv';
 import { Activity } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
+export async function GET(request: NextRequest) {
+  try {
+    const user = await getAuthUser(request);
+    
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    const activities = await getActivities();
+    return NextResponse.json({ activities });
+  } catch (error) {
+    console.error('Error getting activities:', error);
+    return NextResponse.json(
+      { error: 'Failed to get activities' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const user = await getAuthUser(request);
@@ -24,7 +46,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get existing activities
+    // Read existing activities from KV
     const activities = await getActivities();
     
     // Create new activity
@@ -41,11 +63,12 @@ export async function POST(request: NextRequest) {
       category,
     };
 
-    // Add to activities array and save to KV
+    // Append new activity and write updated list back to KV
     const updatedActivities = [...activities, newActivity];
     await saveActivities(updatedActivities);
 
-    return NextResponse.json({ activity: newActivity });
+    // Return the full updated activity list
+    return NextResponse.json({ activities: updatedActivities });
   } catch (error) {
     console.error('Error adding activity:', error);
     return NextResponse.json(
