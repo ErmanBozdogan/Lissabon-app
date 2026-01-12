@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { voteOnActivity, removeVote } from '@/lib/data';
 import { getCurrentUser as getAuthUser } from '@/lib/auth';
+import { getActivities, saveActivities } from '@/lib/kv';
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,14 +29,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const activity = voteOnActivity(activityId, user.id, user.name, vote);
+    const activities = await getActivities();
+    const activityIndex = activities.findIndex(a => a.id === activityId);
 
-    if (!activity) {
+    if (activityIndex === -1) {
       return NextResponse.json(
         { error: 'Activity not found' },
         { status: 404 }
       );
     }
+
+    const activity = activities[activityIndex];
+    // Remove existing vote from this user
+    activity.votes = activity.votes.filter(v => v.userId !== user.id);
+    // Add new vote
+    activity.votes.push({ userId: user.id, userName: user.name, vote });
+
+    const updatedActivities = [...activities];
+    updatedActivities[activityIndex] = activity;
+    await saveActivities(updatedActivities);
 
     return NextResponse.json({ activity });
   } catch (error) {
@@ -69,14 +80,23 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const activity = removeVote(activityId, user.id);
+    const activities = await getActivities();
+    const activityIndex = activities.findIndex(a => a.id === activityId);
 
-    if (!activity) {
+    if (activityIndex === -1) {
       return NextResponse.json(
         { error: 'Activity not found' },
         { status: 404 }
       );
     }
+
+    const activity = activities[activityIndex];
+    // Remove vote from this user
+    activity.votes = activity.votes.filter(v => v.userId !== user.id);
+
+    const updatedActivities = [...activities];
+    updatedActivities[activityIndex] = activity;
+    await saveActivities(updatedActivities);
 
     return NextResponse.json({ activity });
   } catch (error) {
