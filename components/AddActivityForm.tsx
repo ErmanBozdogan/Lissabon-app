@@ -35,6 +35,7 @@ export default function AddActivityForm({ day, onSubmit, onCancel }: AddActivity
       setCategory('other');
     } catch (error) {
       console.error('Error adding activity:', error);
+      throw error;
     } finally {
       setIsSubmitting(false);
     }

@@ -59,8 +59,11 @@ export default function DaySection({
         <AddActivityForm
           day={day.date}
           onSubmit={async (activity) => {
-            await onAddActivity(activity);
-            setShowAddForm(false);
+            try {
+              await onAddActivity(activity);
+            } finally {
+              setShowAddForm(false);
+            }
           }}
           onCancel={() => setShowAddForm(false)}
         />
