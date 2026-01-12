@@ -5,12 +5,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 function JoinPageInner() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState('');
-
-  const inviteToken = searchParams.get('token');
 
   useEffect(() => {
     // Check if already authenticated
@@ -22,8 +20,8 @@ function JoinPageInner() {
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !inviteToken) {
-      setError('Name and invite token are required');
+    if (!name.trim() || !password.trim()) {
+      setError('Name and password are required');
       return;
     }
 
@@ -34,7 +32,7 @@ function JoinPageInner() {
       const response = await fetch('/api/auth/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), inviteToken }),
+        body: JSON.stringify({ name: name.trim(), password: password.trim() }),
       });
 
       if (response.ok) {
@@ -53,29 +51,14 @@ function JoinPageInner() {
     }
   };
 
-  if (!inviteToken) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Invalid Invite Link
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            This invite link is invalid. Please ask for a new one.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
           Join Lisbon Trip
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
-          Enter your name to join the trip planning group.
+          Enter your name and password to join the trip planning group.
         </p>
 
         <form onSubmit={handleJoin}>
@@ -87,23 +70,37 @@ function JoinPageInner() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent transition-all"
               placeholder="e.g., Erman"
               required
               autoFocus
             />
           </div>
 
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent transition-all"
+              placeholder="Enter password"
+              required
+            />
+          </div>
+
           {error && (
-            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
               <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
             </div>
           )}
 
           <button
             type="submit"
-            disabled={isJoining || !name.trim()}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isJoining || !name.trim() || !password.trim()}
+            className="w-full bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2.5 px-4 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow"
           >
             {isJoining ? 'Joining...' : 'Join Trip'}
           </button>

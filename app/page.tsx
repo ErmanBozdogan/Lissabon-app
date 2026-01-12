@@ -44,13 +44,8 @@ const fetcher = async (url: string) => {
 
 function HomePageInner() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [inviteUrl, setInviteUrl] = useState<string>('');
-
-  // Check for invite token in URL
-  const inviteToken = searchParams.get('token');
 
   // Fetch trip data with auto-refresh
   const { data: tripData, error, mutate } = useSWR<TripData>(
@@ -91,15 +86,6 @@ function HomePageInner() {
     };
   }, [user, mutate]);
 
-  useEffect(() => {
-    if (inviteToken && !user) {
-      // Show join form
-      const name = prompt('Enter your name to join the trip:');
-      if (name) {
-        joinTrip(name, inviteToken);
-      }
-    }
-  }, [inviteToken]);
 
   const checkAuth = async () => {
     try {
@@ -117,7 +103,6 @@ function HomePageInner() {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-        fetchInviteUrl();
       } else {
         localStorage.removeItem('auth_token');
       }
@@ -129,46 +114,6 @@ function HomePageInner() {
     }
   };
 
-  const joinTrip = async (name: string, token: string) => {
-    try {
-      const response = await fetch('/api/auth/join', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, inviteToken: token }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('auth_token', data.user.token);
-        setUser(data.user);
-        router.push('/');
-        fetchInviteUrl();
-      } else {
-        const error = await response.json();
-        alert(error.error || 'Failed to join trip');
-      }
-    } catch (error) {
-      console.error('Join failed:', error);
-      alert('Failed to join trip');
-    }
-  };
-
-  const fetchInviteUrl = async () => {
-    try {
-      const token = localStorage.getItem('auth_token');
-      const response = await fetch('/api/invite', {
-        headers: token ? {
-          'Authorization': `Bearer ${token}`,
-        } : {},
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setInviteUrl(data.inviteUrl);
-      }
-    } catch (error) {
-      console.error('Failed to fetch invite URL:', error);
-    }
-  };
 
   const handleAddActivity = async (activity: Partial<Activity>) => {
     try {
@@ -338,21 +283,6 @@ function HomePageInner() {
     }
   };
 
-  const handleShareInvite = () => {
-    if (inviteUrl && navigator.share) {
-      navigator.share({
-        title: 'Join our Lisbon Trip!',
-        text: 'Join our Lisbon trip planning group!',
-        url: inviteUrl,
-      });
-    } else if (inviteUrl) {
-      navigator.clipboard.writeText(inviteUrl);
-      alert('Invite link copied to clipboard!');
-    } else {
-      // If no invite URL yet, go to invite page
-      router.push('/invite');
-    }
-  };
 
   if (isLoading) {
     return (
@@ -368,35 +298,19 @@ function HomePageInner() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Lisbon Trip Planner
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            This is a private trip planning app. You need an invite link to join.
+            This is a private trip planning app. Enter the password to access.
           </p>
-          {inviteToken ? (
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-500 mb-4">
-                Enter your name to join:
-              </p>
-              <button
-                onClick={() => {
-                  const name = prompt('Enter your name:');
-                  if (name) {
-                    joinTrip(name, inviteToken);
-                  }
-                }}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-              >
-                Join Trip
-              </button>
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500 dark:text-gray-500">
-              Ask someone in the group for the invite link.
-            </p>
-          )}
+          <button
+            onClick={() => router.push('/join')}
+            className="w-full bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2.5 px-4 rounded-xl transition-all duration-200 shadow-sm hover:shadow"
+          >
+            Enter Password
+          </button>
         </div>
       </div>
     );
@@ -462,26 +376,6 @@ function HomePageInner() {
                 <p className="text-xl text-white/95 font-semibold drop-shadow-lg mb-1">
                   {tripData.days[0].label.split(',')[0]} {tripData.days[0].label.split(',')[1]?.trim()} - {tripData.days[tripData.days.length - 1].label.split(',')[0]} {tripData.days[tripData.days.length - 1].label.split(',')[1]?.trim()}
                 </p>
-              </div>
-              <div className="flex items-center gap-2 ml-4">
-                <button
-                  onClick={handleShareInvite}
-                  className="p-2.5 text-white/90 hover:text-white hover:bg-white/20 transition-all rounded-xl backdrop-blur-sm border border-white/20"
-                  aria-label="Share invite"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                  </svg>
-                </button>
-                <a
-                  href="/invite"
-                  className="p-2.5 text-white/90 hover:text-white hover:bg-white/20 transition-all rounded-xl backdrop-blur-sm border border-white/20"
-                  aria-label="Get invite link"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                  </svg>
-                </a>
               </div>
             </div>
             <div className="pt-4 border-t border-white/20">

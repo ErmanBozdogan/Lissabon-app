@@ -3,26 +3,28 @@ import { addUser, getTripData } from '@/lib/data';
 import { setAuthToken } from '@/lib/auth';
 import { v4 as uuidv4 } from 'uuid';
 
+const TRIP_PASSWORD = 'Mighylisbon2026';
+
 export async function POST(request: NextRequest) {
   try {
-    const { name, inviteToken } = await request.json();
+    const { name, password } = await request.json();
 
-    if (!name || !inviteToken) {
+    if (!name || !password) {
       return NextResponse.json(
-        { error: 'Name and invite token are required' },
+        { error: 'Name and password are required' },
         { status: 400 }
       );
     }
 
-    const tripData = getTripData();
-
-    // Verify invite token
-    if (tripData.inviteToken !== inviteToken) {
+    // Verify password
+    if (password !== TRIP_PASSWORD) {
       return NextResponse.json(
-        { error: 'Invalid invite token' },
+        { error: 'Invalid password' },
         { status: 401 }
       );
     }
+
+    const tripData = getTripData();
 
     // Check if user already exists
     const existingUser = tripData.users.find(u => u.name.toLowerCase() === name.toLowerCase());
