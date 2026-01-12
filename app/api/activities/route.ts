@@ -4,6 +4,8 @@ import { kv } from '@vercel/kv';
 import { Activity } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
+export const dynamic = 'force-dynamic';
+
 const ACTIVITIES_KEY = 'trip:activities';
 
 export async function GET(request: NextRequest) {
