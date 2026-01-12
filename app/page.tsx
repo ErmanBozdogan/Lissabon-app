@@ -153,11 +153,13 @@ function HomePageInner() {
       body: JSON.stringify(activity),
     });
 
-    if (response.ok) {
-      mutateActivities();
-    } else {
-      throw new Error('Failed to add activity');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to add activity' }));
+      throw new Error(errorData.error || 'Failed to add activity');
     }
+
+    // Refetch activities from KV after successful write
+    await mutateActivities(undefined, { revalidate: true });
   };
 
   const handleVote = async (activityId: string, vote: 'yes' | 'no'): Promise<void> => {
@@ -175,7 +177,7 @@ function HomePageInner() {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
       if (response.ok) {
-        mutateActivities();
+        await mutateActivities(undefined, { revalidate: true });
       }
     } else {
       const response = await fetch('/api/votes', {
@@ -187,7 +189,7 @@ function HomePageInner() {
         body: JSON.stringify({ activityId, vote }),
       });
       if (response.ok) {
-        mutateActivities();
+        await mutateActivities(undefined, { revalidate: true });
       }
     }
   };

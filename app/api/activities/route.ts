@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       category,
     };
 
-    // Add to activities array and save
+    // Add to activities array and save to KV
     const updatedActivities = [...activities, newActivity];
     await saveActivities(updatedActivities);
 
