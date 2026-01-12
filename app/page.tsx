@@ -11,22 +11,41 @@ const ACTIVITIES_STORAGE_KEY = 'trip_activities';
 const loadActivitiesFromStorage = (): Activity[] => {
   if (typeof window === 'undefined') return [];
   try {
+    console.log('[LOAD] Loading activities from localStorage');
+    console.log('[LOAD] Storage key:', ACTIVITIES_STORAGE_KEY);
     const stored = localStorage.getItem(ACTIVITIES_STORAGE_KEY);
+    console.log('[LOAD] Raw stored value:', stored);
     if (stored) {
-      return JSON.parse(stored);
+      const parsed = JSON.parse(stored);
+      console.log('[LOAD] Parsed activities count:', parsed.length);
+      console.log('[LOAD] Activities:', parsed);
+      return parsed;
+    } else {
+      console.log('[LOAD] No data found in localStorage for key:', ACTIVITIES_STORAGE_KEY);
     }
   } catch (error) {
-    console.error('Error loading activities from localStorage:', error);
+    console.error('[LOAD] Error loading activities from localStorage:', error);
   }
+  console.log('[LOAD] Returning empty array');
   return [];
 };
 
 const saveActivitiesToStorage = (activities: Activity[]): void => {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(ACTIVITIES_STORAGE_KEY, JSON.stringify(activities));
+    console.log('[SAVE] Saving activities to localStorage');
+    console.log('[SAVE] Storage key:', ACTIVITIES_STORAGE_KEY);
+    console.log('[SAVE] Activities count:', activities.length);
+    console.log('[SAVE] Activities:', activities);
+    const jsonString = JSON.stringify(activities);
+    localStorage.setItem(ACTIVITIES_STORAGE_KEY, jsonString);
+    console.log('[SAVE] Successfully saved to localStorage');
+    // Verify it was saved
+    const verify = localStorage.getItem(ACTIVITIES_STORAGE_KEY);
+    console.log('[SAVE] Verification - data exists:', !!verify);
+    console.log('[SAVE] Verification - data length:', verify?.length);
   } catch (error) {
-    console.error('Error saving activities to localStorage:', error);
+    console.error('[SAVE] Error saving activities to localStorage:', error);
   }
 };
 
@@ -64,13 +83,27 @@ function HomePageInner() {
     }
   );
 
-  // Load activities from localStorage on mount and when user is authenticated
-  useEffect(() => {
-    if (user) {
+// Load activities from localStorage after login is ready
+useEffect(() => {
+    console.log('[EFFECT] Load activities effect triggered');
+    console.log('[EFFECT] user:', user ? { id: user.id, name: user.name } : null);
+    console.log('[EFFECT] staticTripData:', staticTripData ? { tripName: staticTripData.tripName } : null);
+    console.log('[EFFECT] isLoading:', isLoading);
+    
+    // Wait for both user authentication and trip data to be ready
+    if (user && !isLoading) {
+      console.log('[EFFECT] Conditions met - loading activities');
       const storedActivities = loadActivitiesFromStorage();
+      console.log('[EFFECT] Loaded activities count:', storedActivities.length);
       setActivities(storedActivities);
+      console.log('[EFFECT] Activities set in state');
+    } else {
+      console.log('[EFFECT] Conditions not met - skipping load');
+      if (!user) console.log('[EFFECT] Missing: user');
+    
+      if (isLoading) console.log('[EFFECT] Still loading');
     }
-  }, [user]);
+  }, [user, isLoading]);
 
   // Merge static trip data with activities from state
   const tripData: TripData | undefined = staticTripData ? {
@@ -79,13 +112,20 @@ function HomePageInner() {
   } : undefined;
 
   useEffect(() => {
+    console.log('[MOUNT] Component mounted');
+    console.log('[MOUNT] Checking localStorage on mount');
+    const checkStorage = localStorage.getItem(ACTIVITIES_STORAGE_KEY);
+    console.log('[MOUNT] Activities in localStorage:', checkStorage ? JSON.parse(checkStorage).length : 0);
+    console.log('[MOUNT] Storage key:', ACTIVITIES_STORAGE_KEY);
     checkAuth();
   }, []);
 
 
   const checkAuth = async () => {
     try {
+      console.log('[AUTH] checkAuth called');
       const token = localStorage.getItem('auth_token');
+      console.log('[AUTH] Token exists:', !!token);
       
       // Stateless auth: if token exists, user is authenticated
       // No need to verify with server - token presence = authenticated
@@ -93,6 +133,7 @@ function HomePageInner() {
         // Get stored user info from localStorage (set during join)
         const storedName = localStorage.getItem('user_name') || 'User';
         const storedId = localStorage.getItem('user_id') || 'user';
+        console.log('[AUTH] Stored user info:', { id: storedId, name: storedName });
         
         // Create a basic user object from the token
         // The token itself is the proof of authentication
@@ -118,27 +159,33 @@ function HomePageInner() {
               if (data.user.name) {
                 localStorage.setItem('user_name', data.user.name);
               }
+              console.log('[AUTH] Setting user from server response:', data.user);
               setUser(data.user);
             } else {
+              console.log('[AUTH] Setting user from localStorage:', user);
               setUser(user);
             }
           } else {
             // Even if server check fails, trust the token (stateless)
+            console.log('[AUTH] Server check failed, setting user from localStorage:', user);
             setUser(user);
           }
         } catch (error) {
           // If server check fails, still trust the token
-          console.warn('Auth check with server failed, using token:', error);
+          console.warn('[AUTH] Server check error, using token:', error);
+          console.log('[AUTH] Setting user from localStorage:', user);
           setUser(user);
         }
       } else {
         // No token = not authenticated
+        console.log('[AUTH] No token found, setting user to null');
         setUser(null);
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      console.error('[AUTH] Auth check failed:', error);
       setUser(null);
     } finally {
+      console.log('[AUTH] Setting isLoading to false');
       setIsLoading(false);
     }
   };
@@ -166,7 +213,7 @@ function HomePageInner() {
     // Add new activity to state and localStorage
     const updatedActivities = [...activities, newActivity];
     setActivities(updatedActivities);
-    saveActivitiesToStorage(updatedActivities);
+    localStorage.setItem('trip_activities', JSON.stringify(updatedActivities));
   };
 
   const handleVote = async (activityId: string, vote: 'yes' | 'no'): Promise<void> => {
