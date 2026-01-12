@@ -43,21 +43,49 @@ function JoinPageInner() {
     try {
       // Send exactly: { name: string, password: string }
       // Both values are trimmed on frontend before sending
+      const payload = {
+        name: trimmedName,
+        password: trimmedPassword,
+      };
+      
+      // DEBUG: Log exact payload being sent
+      console.log('FRONTEND SENDING:', JSON.stringify(payload));
+      console.log('Payload details:', { 
+        name: payload.name, 
+        nameType: typeof payload.name,
+        nameLength: payload.name.length,
+        password: payload.password, 
+        passwordType: typeof payload.password,
+        passwordLength: payload.password.length 
+      });
+      
       const response = await fetch('/api/auth/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: trimmedName,
-          password: trimmedPassword,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('auth_token', data.user.token);
-        router.push('/');
+        
+        // DEBUG: Log response data
+        console.log('JOIN RESPONSE:', data);
+        console.log('Response details:', {
+          hasUser: !!data.user,
+          hasToken: !!data.user?.token,
+          userId: data.user?.id,
+          userName: data.user?.name
+        });
+        
+        if (data.user && data.user.token) {
+          localStorage.setItem('auth_token', data.user.token);
+          router.push('/');
+        } else {
+          setError('Invalid response from server');
+        }
       } else {
         const errorData = await response.json();
+        console.log('JOIN ERROR RESPONSE:', errorData);
         setError(errorData.error || 'Failed to join trip');
       }
     } catch (error) {
