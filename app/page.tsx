@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { TripData, Activity, User } from '@/types';
 import DaySection from '@/components/DaySection';
@@ -9,6 +9,7 @@ import useSWR from 'swr';
 const ACTIVITIES_STORAGE_KEY = 'trip_activities';
 
 const loadActivitiesFromStorage = (): Activity[] => {
+  if (typeof window === 'undefined') return [];
   try {
     const stored = localStorage.getItem(ACTIVITIES_STORAGE_KEY);
     if (stored) {
@@ -21,6 +22,7 @@ const loadActivitiesFromStorage = (): Activity[] => {
 };
 
 const saveActivitiesToStorage = (activities: Activity[]): void => {
+  if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(ACTIVITIES_STORAGE_KEY, JSON.stringify(activities));
   } catch (error) {
@@ -48,6 +50,8 @@ function HomePageInner() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Store activities in state, initialized from localStorage
+  const [activities, setActivities] = useState<Activity[]>([]);
 
   // Fetch static trip data (structure only, no activities)
   const { data: staticTripData, error, mutate } = useSWR<TripData>(
@@ -60,23 +64,23 @@ function HomePageInner() {
     }
   );
 
-  // Merge static trip data with localStorage activities
+  // Load activities from localStorage on mount and when user is authenticated
+  useEffect(() => {
+    if (user) {
+      const storedActivities = loadActivitiesFromStorage();
+      setActivities(storedActivities);
+    }
+  }, [user]);
+
+  // Merge static trip data with activities from state
   const tripData: TripData | undefined = staticTripData ? {
     ...staticTripData,
-    activities: loadActivitiesFromStorage(),
+    activities: activities,
   } : undefined;
 
   useEffect(() => {
     checkAuth();
   }, []);
-
-  // Trigger re-render when activities change (for UI updates)
-  useEffect(() => {
-    if (user && staticTripData) {
-      // Force re-render to update tripData with latest activities
-      mutate();
-    }
-  }, [user, staticTripData, mutate]);
 
 
   const checkAuth = async () => {
@@ -159,34 +163,23 @@ function HomePageInner() {
       category: activity.category,
     };
 
-    // Load existing activities from localStorage
-    const existingActivities = loadActivitiesFromStorage();
-    
-    // Add new activity
-    const updatedActivities = [...existingActivities, newActivity];
-    
-    // Save to localStorage
+    // Add new activity to state and localStorage
+    const updatedActivities = [...activities, newActivity];
+    setActivities(updatedActivities);
     saveActivitiesToStorage(updatedActivities);
-    
-    // Update UI immediately by triggering a re-render
-    // The tripData will be recalculated on next render with updated activities
-    mutate();
   };
 
   const handleVote = async (activityId: string, vote: 'yes' | 'no'): Promise<void> => {
     if (!user || !tripData) return;
 
-    // Load existing activities from localStorage
-    const existingActivities = loadActivitiesFromStorage();
-    
     // Find the activity
-    const activityIndex = existingActivities.findIndex(a => a.id === activityId);
+    const activityIndex = activities.findIndex(a => a.id === activityId);
     if (activityIndex === -1) {
       console.error('Activity not found');
       return;
     }
 
-    const activity = existingActivities[activityIndex];
+    const activity = activities[activityIndex];
     const currentVote = activity.votes.find(v => v.userId === user.id);
 
     // If clicking the same vote, remove it
@@ -199,60 +192,50 @@ function HomePageInner() {
     }
 
     // Update the activities array
-    const updatedActivities = [...existingActivities];
+    const updatedActivities = [...activities];
     updatedActivities[activityIndex] = activity;
 
-    // Save to localStorage
+    // Update state and localStorage
+    setActivities(updatedActivities);
     saveActivitiesToStorage(updatedActivities);
-
-    // Update UI immediately
-    mutate();
   };
 
   const handleEditActivity = async (activityId: string, updates: Partial<Activity>): Promise<void> => {
     if (!user) return;
 
-    // Load existing activities from localStorage
-    const existingActivities = loadActivitiesFromStorage();
-    
     // Find and update the activity
-    const activityIndex = existingActivities.findIndex(a => a.id === activityId);
+    const activityIndex = activities.findIndex(a => a.id === activityId);
     if (activityIndex === -1) {
       console.error('Activity not found');
       return;
     }
 
     // Only creator can edit
-    if (existingActivities[activityIndex].creatorId !== user.id) {
+    if (activities[activityIndex].creatorId !== user.id) {
       console.error('Only creator can edit activity');
       return;
     }
 
     // Update the activity
     const updatedActivity = {
-      ...existingActivities[activityIndex],
+      ...activities[activityIndex],
       ...updates,
     };
 
     // Update the activities array
-    const updatedActivities = [...existingActivities];
+    const updatedActivities = [...activities];
     updatedActivities[activityIndex] = updatedActivity;
 
-    // Save to localStorage
+    // Update state and localStorage
+    setActivities(updatedActivities);
     saveActivitiesToStorage(updatedActivities);
-
-    // Update UI immediately
-    mutate();
   };
 
   const handleDeleteActivity = async (activityId: string): Promise<void> => {
     if (!user) return;
 
-    // Load existing activities from localStorage
-    const existingActivities = loadActivitiesFromStorage();
-    
     // Find the activity
-    const activity = existingActivities.find(a => a.id === activityId);
+    const activity = activities.find(a => a.id === activityId);
     if (!activity) {
       console.error('Activity not found');
       return;
@@ -265,13 +248,11 @@ function HomePageInner() {
     }
 
     // Remove the activity
-    const updatedActivities = existingActivities.filter(a => a.id !== activityId);
+    const updatedActivities = activities.filter(a => a.id !== activityId);
 
-    // Save to localStorage
+    // Update state and localStorage
+    setActivities(updatedActivities);
     saveActivitiesToStorage(updatedActivities);
-
-    // Update UI immediately
-    mutate();
   };
 
 
