@@ -1,0 +1,124 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Activity } from '@/types';
+
+interface EditActivityFormProps {
+  activity: Activity;
+  onSubmit: (activityId: string, updates: Partial<Activity>) => Promise<void>;
+  onCancel: () => void;
+}
+
+export default function EditActivityForm({ activity, onSubmit, onCancel }: EditActivityFormProps) {
+  const [title, setTitle] = useState(activity.title);
+  const [description, setDescription] = useState(activity.description || '');
+  const [location, setLocation] = useState(activity.location || '');
+  const [category, setCategory] = useState<Activity['category']>(activity.category || 'other');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setTitle(activity.title);
+    setDescription(activity.description || '');
+    setLocation(activity.location || '');
+    setCategory(activity.category || 'other');
+  }, [activity]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      await onSubmit(activity.id, {
+        title: title.trim(),
+        description: description.trim() || undefined,
+        location: location.trim() || undefined,
+        category,
+      });
+    } catch (error) {
+      console.error('Error updating activity:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-900/50 rounded-2xl shadow-sm p-5 mb-4 border border-gray-100 dark:border-gray-800/50">
+      <div className="mb-4">
+        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">
+          Titel *
+        </label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent transition-all"
+          placeholder="f.eks. Besøg Belém Tower"
+          required
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">
+          Kategori
+        </label>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value as Activity['category'])}
+          className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent transition-all"
+        >
+          <option value="restaurant">🍽️ Restaurant</option>
+          <option value="brunch">🥐 Brunch</option>
+          <option value="sightseeing">🏛️ Seværdighed</option>
+          <option value="bar">🍻 Bar</option>
+          <option value="cafe">☕ Cafe</option>
+          <option value="experience">🎭 Oplevelse</option>
+          <option value="other">📍 Andet</option>
+        </select>
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">
+          Beskrivelse
+        </label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent transition-all resize-none"
+          placeholder="Valgfri beskrivelse..."
+          rows={3}
+        />
+      </div>
+
+      <div className="mb-5">
+        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">
+          Lokation
+        </label>
+        <input
+          type="text"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent transition-all"
+          placeholder="Valgfri adresse, lokation eller website URL"
+        />
+      </div>
+
+      <div className="flex gap-2.5">
+        <button
+          type="submit"
+          disabled={isSubmitting || !title.trim()}
+          className="flex-1 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2.5 px-4 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow"
+        >
+          {isSubmitting ? 'Gemmer...' : 'Gem ændringer'}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-200"
+        >
+          Annuller
+        </button>
+      </div>
+    </form>
+  );
+}
