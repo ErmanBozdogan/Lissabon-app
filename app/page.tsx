@@ -390,11 +390,27 @@ function HomePageInner() {
               rel="noopener noreferrer"
               className="flex items-center gap-3 group"
             >
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 relative">
                 <img
                   src="https://images.unsplash.com/photo-1556912172-45b7ce8ba90e?w=200&h=200&fit=crop&q=80"
                   alt="Lisbon Airbnb preview"
                   className="w-16 h-16 rounded-xl object-cover group-hover:scale-105 transition-transform duration-300"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    // Fallback to local Airbnb logo if external image fails
+                    target.src = '/images/airbnb-fallback.svg';
+                    target.onerror = () => {
+                      // Final fallback: inline SVG Airbnb icon (always works)
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent && !parent.querySelector('.airbnb-icon-fallback')) {
+                        const fallback = document.createElement('div');
+                        fallback.className = 'airbnb-icon-fallback w-16 h-16 rounded-xl bg-gradient-to-br from-pink-500 to-red-600 flex items-center justify-center';
+                        fallback.innerHTML = '<svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm0 22C6.5 22 2 17.5 2 12S6.5 2 12 2s10 4.5 10 10-4.5 10-10 10zm-1-15h2v6h-2zm0 8h2v2h-2z"/></svg>';
+                        parent.appendChild(fallback);
+                      }
+                    };
+                  }}
                 />
               </div>
               <div className="flex-1">
