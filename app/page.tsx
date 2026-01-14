@@ -327,7 +327,7 @@ function HomePageInner() {
       {showToast && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 transition-opacity duration-300">
           <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-xl shadow-lg font-medium">
-            Hold kæft det bliver godt
+            kæft det bliver godt
           </div>
         </div>
       )}
@@ -404,7 +404,7 @@ function HomePageInner() {
           <div className="mb-8">
             <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
               <span className="text-2xl">🏛️</span>
-              Seværdigheder
+              Sightseeing
             </h3>
             <div className="grid gap-4 md:grid-cols-2">
               {[
@@ -444,7 +444,7 @@ function HomePageInner() {
           <div className="mb-8">
             <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
               <span className="text-2xl">🍽️</span>
-              Restauranter
+              Restaurants
             </h3>
             <div className="grid gap-4 md:grid-cols-2">
               {[
@@ -524,7 +524,7 @@ function HomePageInner() {
           <div>
             <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
               <span className="text-2xl">☕</span>
-              Morgenmad
+              Breakfast
             </h3>
             <div className="grid gap-4 md:grid-cols-2">
               {[
