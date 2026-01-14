@@ -1,13 +1,13 @@
 'use client';
 
-import { Activity, Vote } from '@/types';
+import { Activity } from '@/types';
 import { useState } from 'react';
 import EditActivityForm from './EditActivityForm';
 
 interface ActivityCardProps {
   activity: Activity;
   currentUserId: string;
-  onVote: (activityId: string, vote: 'yes' | 'no') => void;
+  onVote: (activityId: string) => void;
   onDelete: (activityId: string) => void;
   onEdit: (activityId: string, updates: Partial<Activity>) => Promise<void>;
 }
@@ -16,19 +16,16 @@ export default function ActivityCard({ activity, currentUserId, onVote, onDelete
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   
-  // Get current user name from localStorage for vote checking
-  const currentUserName = typeof window !== 'undefined' ? (localStorage.getItem('user_name') || 'User') : 'User';
-  // Check vote by userName (unique identifier) instead of userId
-  const userVote = activity.votes.find(v => v.userName === currentUserName);
-  const yesVotes = activity.votes.filter(v => v.vote === 'yes').length;
-  const noVotes = activity.votes.filter(v => v.vote === 'no').length;
+  // Get current user name from localStorage
+  const currentUserName = typeof window !== 'undefined' ? (localStorage.getItem('user_name') || '') : '';
+  // Check if current user has liked this activity
+  const hasLiked = currentUserName && activity.likes ? activity.likes.includes(currentUserName) : false;
+  // Get like count
+  const likeCount = activity.likes ? activity.likes.length : 0;
 
-  const handleVote = (vote: 'yes' | 'no') => {
-    if (userVote?.vote === vote) {
-      // Remove vote if clicking the same vote
-      onVote(activity.id, vote);
-    } else {
-      onVote(activity.id, vote);
+  const handleLike = () => {
+    if (currentUserName) {
+      onVote(activity.id);
     }
   };
 
@@ -255,26 +252,15 @@ export default function ActivityCard({ activity, currentUserId, onVote, onDelete
 
       <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
         <button
-          onClick={() => handleVote('yes')}
+          onClick={handleLike}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-            userVote?.vote === 'yes'
+            hasLiked
               ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 shadow-sm'
               : 'bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 hover:text-emerald-600 dark:hover:text-emerald-400'
           }`}
         >
           <span className="text-base">👍</span>
-          {yesVotes > 0 && <span>({yesVotes})</span>}
-        </button>
-        <button
-          onClick={() => handleVote('no')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-            userVote?.vote === 'no'
-              ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 shadow-sm'
-              : 'bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-600 dark:hover:text-rose-400'
-          }`}
-        >
-          <span className="text-base">👎</span>
-          {noVotes > 0 && <span>({noVotes})</span>}
+          {likeCount > 0 && <span>({likeCount})</span>}
         </button>
       </div>
     </div>

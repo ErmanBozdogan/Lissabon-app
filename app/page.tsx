@@ -147,7 +147,11 @@ function HomePageInner() {
     }
 
     const token = localStorage.getItem('auth_token');
-    const userName = user.name || localStorage.getItem('user_name') || 'User';
+    const userName = user.name || localStorage.getItem('user_name');
+    if (!userName) {
+      console.error('User name is required');
+      return;
+    }
     const response = await fetch('/api/activities', {
       method: 'POST',
       headers: {
@@ -203,53 +207,38 @@ function HomePageInner() {
     setSelectedInspiration(null);
   };
 
-  const handleVote = async (activityId: string, vote: 'yes' | 'no'): Promise<void> => {
+  const handleVote = async (activityId: string): Promise<void> => {
     if (!user || !tripData) return;
 
-    // Get the actual user name from user object or localStorage
-    const userName = user.name || localStorage.getItem('user_name') || 'User';
+    // Get the actual user name from user object or localStorage - MUST NOT be 'User'
+    const userName = user.name || localStorage.getItem('user_name');
     
-    const activity = activities.find(a => a.id === activityId);
-    // Check vote by userName (unique identifier) instead of userId
-    const currentVote = activity?.votes.find(v => v.userName === userName);
+    if (!userName || userName === 'User') {
+      console.error('User name is required and cannot be "User"');
+      return;
+    }
 
     const token = localStorage.getItem('auth_token');
     
-    // If clicking the same vote, remove it
-    if (currentVote?.vote === vote) {
-      const response = await fetch(`/api/votes?activityId=${activityId}&userName=${encodeURIComponent(userName)}`, {
-        method: 'DELETE',
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-      });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.activity) {
-          // Refetch activities to get updated list
-          await mutateActivities();
-        }
-      } else {
-        const errorData = await response.json().catch(() => ({ error: 'Failed to vote' }));
-        console.error('Failed to vote:', errorData.error || 'Unknown error');
+    // Call the likes API to toggle like
+    const response = await fetch('/api/likes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ activityId, userName }),
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.activity) {
+        // Refetch activities to get updated list from server
+        await mutateActivities();
       }
     } else {
-      const response = await fetch('/api/votes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ activityId, vote, userName }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.activity) {
-          // Refetch activities to get updated list
-          await mutateActivities();
-        }
-      } else {
-        const errorData = await response.json().catch(() => ({ error: 'Failed to vote' }));
-        console.error('Failed to vote:', errorData.error || 'Unknown error');
-      }
+      const errorData = await response.json().catch(() => ({ error: 'Failed to toggle like' }));
+      console.error('Failed to toggle like:', errorData.error || 'Unknown error');
     }
   };
 
@@ -437,7 +426,7 @@ function HomePageInner() {
             </div>
             <div className="pt-4 border-t border-white/20">
               <p className="text-xs text-white/70">
-                Logget ind som <span className="font-medium text-white/90">{user.name || localStorage.getItem('user_name') || 'User'}</span>
+                Logget ind som <span className="font-medium text-white/90">{user.name || localStorage.getItem('user_name') || ''}</span>
               </p>
             </div>
           </div>

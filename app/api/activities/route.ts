@@ -108,8 +108,17 @@ export async function POST(request: NextRequest) {
       tripData = getDefaultTripData();
     }
 
-    // Use creatorName from request if provided, otherwise fall back to user.name
-    const activityCreatorName = creatorName || user.name || 'User';
+    // creatorName MUST be provided from client - never use 'User' as fallback
+    if (!creatorName || creatorName === 'User') {
+      return new Response(JSON.stringify({ error: 'Creator name is required and cannot be "User"' }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
+    const activityCreatorName = creatorName;
 
     const newActivity: Activity = {
       id: `activity-${Date.now()}-${uuidv4()}`,
@@ -120,7 +129,7 @@ export async function POST(request: NextRequest) {
       creatorId: user.id,
       creatorName: activityCreatorName,
       createdAt: new Date().toISOString(),
-      votes: [],
+      likes: [],
       category,
     };
 

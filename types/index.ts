@@ -5,22 +5,16 @@ export interface User {
   joinedAt: string;
 }
 
-export interface Vote {
-  userId: string;
-  userName: string;
-  vote: 'yes' | 'no';
-}
-
 export interface Activity {
   id: string;
   title: string;
   description?: string;
   location?: string;
-  day: string; // Format: "2025-02-11"
+  day: string; // Format: "2026-02-11"
   creatorId: string;
   creatorName: string;
   createdAt: string;
-  votes: Vote[];
+  likes: string[]; // Array of user names who liked this activity
   category?: 'restaurant' | 'brunch' | 'sightseeing' | 'bar' | 'cafe' | 'experience' | 'other';
 }
 

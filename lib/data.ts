@@ -1,4 +1,4 @@
-import { TripData, Activity, User, Vote } from '@/types';
+import { TripData, Activity, User } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import path from 'path';
@@ -102,7 +102,7 @@ export const addActivity = (
     creatorId,
     creatorName,
     createdAt: new Date().toISOString(),
-    votes: [],
+    likes: [],
     category,
   };
   data.activities.push(activity);
@@ -156,36 +156,27 @@ export const deleteActivity = (activityId: string, userId: string): boolean => {
   return true;
 };
 
-// Vote on activity
-export const voteOnActivity = (
+// Like/unlike activity
+export const toggleLike = (
   activityId: string,
-  userId: string,
-  userName: string,
-  vote: 'yes' | 'no'
+  userName: string
 ): Activity | null => {
   const data = readTripData();
   const activity = data.activities.find(a => a.id === activityId);
   
   if (!activity) return null;
   
-  // Remove existing vote from this user
-  activity.votes = activity.votes.filter(v => v.userId !== userId);
+  // Ensure likes array exists
+  const currentLikes = activity.likes || [];
   
-  // Add new vote
-  activity.votes.push({ userId, userName, vote });
+  // Toggle like: if user name is in likes, remove it; otherwise add it
+  if (currentLikes.includes(userName)) {
+    activity.likes = currentLikes.filter(name => name !== userName);
+  } else {
+    activity.likes = [...currentLikes, userName];
+  }
   
   writeTripData(data);
   return activity;
 };
 
-// Remove vote
-export const removeVote = (activityId: string, userId: string): Activity | null => {
-  const data = readTripData();
-  const activity = data.activities.find(a => a.id === activityId);
-  
-  if (!activity) return null;
-  
-  activity.votes = activity.votes.filter(v => v.userId !== userId);
-  writeTripData(data);
-  return activity;
-};

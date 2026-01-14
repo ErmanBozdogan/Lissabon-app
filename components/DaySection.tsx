@@ -9,7 +9,7 @@ interface DaySectionProps {
   activities: Activity[];
   currentUserId: string;
   onAddActivity: (activity: Partial<Activity>) => Promise<void>;
-  onVote: (activityId: string, vote: 'yes' | 'no') => Promise<void>;
+  onVote: (activityId: string) => Promise<void>;
   onEditActivity: (activityId: string, updates: Partial<Activity>) => Promise<void>;
   onDeleteActivity: (activityId: string) => Promise<void>;
 }
