@@ -452,6 +452,43 @@ function HomePageInner() {
           </div>
         </div>
 
+        {/* Flight Information */}
+        <div className="mb-8">
+          <div className="bg-white dark:bg-gray-900/50 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-800/50 mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50 mb-4 flex items-center gap-2">
+              <span className="text-xl">✈️</span>
+              Outbound Flight
+            </h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800/50">
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Departure</span>
+                <span className="text-sm text-gray-900 dark:text-gray-50 font-medium">Copenhagen Wed. Feb 11 at 13:30</span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Arrival</span>
+                <span className="text-sm text-gray-900 dark:text-gray-50 font-medium">Lisbon 16:05</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-gray-900/50 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-800/50">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50 mb-4 flex items-center gap-2">
+              <span className="text-xl">✈️</span>
+              Return Flight
+            </h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800/50">
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Departure</span>
+                <span className="text-sm text-gray-900 dark:text-gray-50 font-medium">Lisbon Sun. Feb 15 at 16:55</span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Arrival</span>
+                <span className="text-sm text-gray-900 dark:text-gray-50 font-medium">Copenhagen 21:35</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Days */}
         {tripData.days.map((day) => (
           <DaySection
