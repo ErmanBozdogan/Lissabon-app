@@ -436,6 +436,20 @@ function HomePageInner() {
         </div>
       )}
       <div className="max-w-2xl mx-auto px-4 py-8">
+        {/* Logout Button - Outside header, left side */}
+        <div className="mb-4">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-xl transition-all duration-200 shadow-sm hover:shadow"
+            aria-label="Log out"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span className="font-medium text-sm">Log out</span>
+          </button>
+        </div>
+
         {/* Header with Background Image */}
         <div className="relative rounded-2xl shadow-lg mb-8 overflow-hidden min-h-[280px]">
           {/* Background Image */}
@@ -458,37 +472,24 @@ function HomePageInner() {
           
           {/* Content */}
           <div className="relative z-10 p-8 h-full flex flex-col justify-between">
-            <div className="flex items-start justify-between mb-4">
-              {/* Logout Button - Top Left */}
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all duration-200 backdrop-blur-sm border border-white/20 hover:border-white/30 shadow-lg hover:shadow-xl"
-                aria-label="Log out"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span className="font-medium text-sm">Log out</span>
-              </button>
-              <div className="flex-1 text-center">
-                <h1 className="text-4xl font-bold text-white tracking-tight mb-3 drop-shadow-2xl">
-                  {tripData.tripName}
-                </h1>
-                <p className="text-xl text-white/95 font-semibold drop-shadow-lg mb-1">
-                  {(() => {
-                    const startDate = new Date(tripData.days[0].date);
-                    const endDate = new Date(tripData.days[tripData.days.length - 1].date);
-                    const startDay = startDate.getDate();
-                    const endDay = endDate.getDate();
-                    const startMonth = startDate.toLocaleDateString('en-US', { month: 'long' });
-                    const endMonth = endDate.toLocaleDateString('en-US', { month: 'long' });
-                    return `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
-                  })()}
-                </p>
-              </div>
+            <div className="mb-4">
+              <h1 className="text-4xl font-bold text-white tracking-tight mb-3 drop-shadow-2xl text-center">
+                {tripData.tripName}
+              </h1>
+              <p className="text-xl text-white/95 font-semibold drop-shadow-lg mb-1 text-center">
+                {(() => {
+                  const startDate = new Date(tripData.days[0].date);
+                  const endDate = new Date(tripData.days[tripData.days.length - 1].date);
+                  const startDay = startDate.getDate();
+                  const endDay = endDate.getDate();
+                  const startMonth = startDate.toLocaleDateString('en-US', { month: 'long' });
+                  const endMonth = endDate.toLocaleDateString('en-US', { month: 'long' });
+                  return `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
+                })()}
+              </p>
             </div>
             <div className="pt-4 border-t border-white/20">
-              <p className="text-xs text-white/70">
+              <p className="text-xs text-white/70 text-center">
                 Logget ind som <span className="font-medium text-white/90">{user.name || localStorage.getItem('user_name') || ''}</span>
               </p>
             </div>
