@@ -393,6 +393,83 @@ function HomePageInner() {
             onDeleteActivity={handleDeleteActivity}
           />
         ))}
+
+        {/* Inspiration Section */}
+        <div className="mt-12 mb-8">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-50 tracking-tight mb-6">
+            Inspiration
+          </h2>
+          
+          {/* Sightseeing */}
+          <div className="mb-8">
+            <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+              <span className="text-2xl">🏛️</span>
+              Seværdigheder
+            </h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              {[
+                { name: 'Belém Tower', description: 'Historic tower and UNESCO World Heritage site', location: 'Avenida Brasília' },
+                { name: 'Jerónimos Monastery', description: 'Manueline architecture masterpiece', location: 'Praça do Império' },
+                { name: 'São Jorge Castle', description: 'Medieval castle with panoramic city views', location: 'Castelo de São Jorge' },
+                { name: 'Alfama District', description: 'Historic neighborhood with narrow streets', location: 'Alfama' },
+                { name: 'Tram 28', description: 'Iconic tram route through historic neighborhoods', location: 'Various stops' },
+                { name: 'Lisbon Oceanarium', description: 'One of the largest aquariums in Europe', location: 'Parque das Nações' },
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white dark:bg-gray-900/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50"
+                >
+                  <h4 className="font-semibold text-base text-gray-900 dark:text-gray-50 mb-1.5">
+                    {item.name}
+                  </h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
+                    {item.description}
+                  </p>
+                  {item.location && (
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      📍 {item.location}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Restaurants */}
+          <div>
+            <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+              <span className="text-2xl">🍽️</span>
+              Restauranter
+            </h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              {[
+                { name: 'Time Out Market', description: 'Food hall with local and international cuisine', location: 'Mercado da Ribeira' },
+                { name: 'Cervejaria Ramiro', description: 'Famous seafood restaurant', location: 'Avenida Almirante Reis' },
+                { name: 'Pasteis de Belém', description: 'Original pastel de nata bakery', location: 'Rua de Belém' },
+                { name: 'Taberna da Rua das Flores', description: 'Traditional Portuguese tapas', location: 'Rua das Flores' },
+                { name: 'A Cevicheria', description: 'Modern Peruvian-inspired seafood', location: 'Rua Dom Pedro V' },
+                { name: 'Bairro do Avillez', description: 'Celebrity chef José Avillez restaurant', location: 'Rua Nova da Trindade' },
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white dark:bg-gray-900/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50"
+                >
+                  <h4 className="font-semibold text-base text-gray-900 dark:text-gray-50 mb-1.5">
+                    {item.name}
+                  </h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
+                    {item.description}
+                  </p>
+                  {item.location && (
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      📍 {item.location}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
