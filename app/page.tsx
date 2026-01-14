@@ -326,7 +326,7 @@ function HomePageInner() {
       {/* Toast Notification */}
       {showToast && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 transition-opacity duration-300">
-          <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-xl shadow-lg font-medium">
+          <div className="bg-green-600 text-white px-12 py-6 rounded-xl shadow-lg font-medium text-2xl">
             kæft det bliver godt
           </div>
         </div>
