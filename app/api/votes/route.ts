@@ -44,17 +44,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const activity = activities[activityIndex];
+    // Create a deep copy of the activity to avoid mutation issues
+    const activity = { ...activities[activityIndex] };
+    // Ensure votes array exists (defensive check)
+    const existingVotes = activity.votes || [];
     // Remove existing vote from this user (check by userName for uniqueness)
-    activity.votes = activity.votes.filter(v => v.userName !== uniqueUserName);
+    // Create a new votes array without this user's existing vote
+    const filteredVotes = existingVotes.filter(v => v.userName !== uniqueUserName);
     // Add new vote with userName as unique identifier
-    activity.votes.push({ userId: uniqueUserId, userName: uniqueUserName, vote });
+    const updatedVotes = [...filteredVotes, { userId: uniqueUserId, userName: uniqueUserName, vote }];
+    
+    // Create updated activity with new votes array
+    const updatedActivity = {
+      ...activity,
+      votes: updatedVotes,
+    };
 
+    // Create a new activities array with the updated activity
     const updatedActivities = [...activities];
-    updatedActivities[activityIndex] = activity;
+    updatedActivities[activityIndex] = updatedActivity;
     await saveActivities(updatedActivities);
 
-    return NextResponse.json({ activity });
+    return NextResponse.json({ activity: updatedActivity });
   } catch (error) {
     console.error('Error voting on activity:', error);
     return NextResponse.json(
@@ -99,15 +110,26 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const activity = activities[activityIndex];
+    // Create a deep copy of the activity to avoid mutation issues
+    const activity = { ...activities[activityIndex] };
+    // Ensure votes array exists (defensive check)
+    const existingVotes = activity.votes || [];
     // Remove vote from this user (check by userName for uniqueness)
-    activity.votes = activity.votes.filter(v => v.userName !== uniqueUserName);
+    // Create a new votes array without this user's vote
+    const updatedVotes = existingVotes.filter(v => v.userName !== uniqueUserName);
+    
+    // Create updated activity with new votes array
+    const updatedActivity = {
+      ...activity,
+      votes: updatedVotes,
+    };
 
+    // Create a new activities array with the updated activity
     const updatedActivities = [...activities];
-    updatedActivities[activityIndex] = activity;
+    updatedActivities[activityIndex] = updatedActivity;
     await saveActivities(updatedActivities);
 
-    return NextResponse.json({ activity });
+    return NextResponse.json({ activity: updatedActivity });
   } catch (error) {
     console.error('Error removing vote:', error);
     return NextResponse.json(
