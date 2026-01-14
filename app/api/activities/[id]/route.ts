@@ -18,22 +18,6 @@ export async function DELETE(
 
     const { id } = await params;
     
-    // Get userName from request body
-    let requestBody;
-    try {
-      requestBody = await request.json();
-    } catch {
-      requestBody = {};
-    }
-    const { userName } = requestBody;
-    
-    if (!userName) {
-      return NextResponse.json(
-        { error: 'User name is required' },
-        { status: 400 }
-      );
-    }
-    
     const activities = await getActivities();
     const activity = activities.find(a => a.id === id);
 
@@ -44,13 +28,7 @@ export async function DELETE(
       );
     }
     
-    // Check authorization by creatorName (userName is the unique identifier)
-    if (activity.creatorName !== userName) {
-      return NextResponse.json(
-        { error: 'Unauthorized - only the creator can delete this activity' },
-        { status: 403 }
-      );
-    }
+    // All authenticated users can delete any activity
 
     const updatedActivities = activities.filter(a => a.id !== id);
     await saveActivities(updatedActivities);
@@ -80,8 +58,7 @@ export async function PATCH(
     }
 
     const { id } = await params;
-    const requestData = await request.json();
-    const { userName, ...updates } = requestData;
+    const updates = await request.json();
     const activities = await getActivities();
     const activityIndex = activities.findIndex(a => a.id === id);
 
@@ -92,16 +69,7 @@ export async function PATCH(
       );
     }
 
-    // Get userName from request or use generic fallback
-    const requestUserName = userName || user.name;
-    
-    // Check authorization by creatorName (userName is the unique identifier)
-    if (activities[activityIndex].creatorName !== requestUserName) {
-      return NextResponse.json(
-        { error: 'Unauthorized - only the creator can edit this activity' },
-        { status: 403 }
-      );
-    }
+    // All authenticated users can edit any activity
 
     const updatedActivity = {
       ...activities[activityIndex],

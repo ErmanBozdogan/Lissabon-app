@@ -297,14 +297,6 @@ function HomePageInner() {
   const handleEditActivity = async (activityId: string, updates: Partial<Activity>): Promise<void> => {
     if (!user) return;
 
-    // Get userName from localStorage (source of truth)
-    const userName = localStorage.getItem('user_name') || user.name;
-    if (!userName || userName === 'User') {
-      console.error('[Edit Activity] User name is required');
-      alert('Error: User name is required. Please log in again.');
-      return;
-    }
-
     const token = localStorage.getItem('auth_token');
     const response = await fetch(`/api/activities/${activityId}`, {
       method: 'PATCH',
@@ -312,10 +304,7 @@ function HomePageInner() {
         'Content-Type': 'application/json',
         ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({
-        ...updates,
-        userName, // Include userName for authorization check
-      }),
+      body: JSON.stringify(updates),
     });
 
     if (response.ok) {
@@ -331,14 +320,6 @@ function HomePageInner() {
   const handleDeleteActivity = async (activityId: string): Promise<void> => {
     if (!user) return;
 
-    // Get userName from localStorage (source of truth)
-    const userName = localStorage.getItem('user_name') || user.name;
-    if (!userName || userName === 'User') {
-      console.error('[Delete Activity] User name is required');
-      alert('Error: User name is required. Please log in again.');
-      return;
-    }
-
     const token = localStorage.getItem('auth_token');
     const response = await fetch(`/api/activities/${activityId}`, {
       method: 'DELETE',
@@ -346,7 +327,6 @@ function HomePageInner() {
         'Content-Type': 'application/json',
         ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ userName }), // Include userName for authorization check
     });
 
     if (response.ok) {
