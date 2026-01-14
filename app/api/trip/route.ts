@@ -1,22 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser as getAuthUser } from '@/lib/auth';
 import { TripData } from '@/types';
+import { kv } from '@vercel/kv';
 import { v4 as uuidv4 } from 'uuid';
 
-/**
- * Stateless trip data endpoint for Vercel serverless
- * 
- * Returns a static trip object with:
- * - Trip name and dates
- * - Day structure
- * - Empty activities and users arrays
- * 
- * IMPORTANT:
- * - Do NOT use getTripData() or any filesystem operations
- * - Do NOT rely on persisted users or activities
- * - This is a temporary stateless fix for Vercel compatibility
- * - Persistence can be added later (e.g., database)
- */
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
+const TRIP_KEY = 'trip:default';
+
 const getDanishWeekday = (dateString: string): string => {
   const date = new Date(dateString + 'T00:00:00');
   const dayOfWeek = date.getDay();
@@ -24,7 +17,7 @@ const getDanishWeekday = (dateString: string): string => {
   return danishWeekdays[dayOfWeek];
 };
 
-const getStaticTripData = (): TripData => {
+const getDefaultTripData = (): TripData => {
   const dates = ['2025-02-11', '2025-02-12', '2025-02-13', '2025-02-14', '2025-02-15'];
   const danishMonths = ['januar', 'februar', 'marts', 'april', 'maj', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'december'];
   
@@ -44,13 +37,12 @@ const getStaticTripData = (): TripData => {
     }),
     activities: [],
     users: [],
-    inviteToken: uuidv4(), // Generate a token for compatibility, but not used in password auth
+    inviteToken: uuidv4(),
   };
 };
 
 export async function GET(request: NextRequest) {
   try {
-    // Stateless auth check - only verifies token presence
     const user = await getAuthUser(request);
     
     if (!user) {
@@ -60,14 +52,72 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Return static trip data (no filesystem operations)
-    const tripData = getStaticTripData();
-    return NextResponse.json(tripData);
+    // Load trip data from KV
+    const tripData = await kv.get<TripData>(TRIP_KEY);
+    
+    // If no trip data exists, initialize with default and save to KV
+    if (!tripData) {
+      const defaultTrip = getDefaultTripData();
+      await kv.set(TRIP_KEY, defaultTrip);
+      return NextResponse.json(defaultTrip, {
+        headers: {
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
+
+    return NextResponse.json(tripData, {
+      headers: {
+        'Cache-Control': 'no-store',
+      },
+    });
   } catch (error) {
     console.error('Error getting trip data:', error);
-    // Always return valid JSON, even on error
     return NextResponse.json(
       { error: 'Failed to get trip data' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const user = await getAuthUser(request);
+    
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    const { activities } = await request.json();
+
+    if (!Array.isArray(activities)) {
+      return NextResponse.json(
+        { error: 'Activities must be an array' },
+        { status: 400 }
+      );
+    }
+
+    // Load current trip data
+    const tripData = await kv.get<TripData>(TRIP_KEY) || getDefaultTripData();
+    
+    // Update activities
+    tripData.activities = activities;
+    
+    // Save back to KV
+    await kv.set(TRIP_KEY, tripData);
+
+    return NextResponse.json(tripData, {
+      headers: {
+        'Cache-Control': 'no-store',
+      },
+    });
+  } catch (error) {
+    console.error('Error saving trip data:', error);
+    return NextResponse.json(
+      { error: 'Failed to save trip data' },
       { status: 500 }
     );
   }
