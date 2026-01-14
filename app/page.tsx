@@ -143,45 +143,62 @@ function HomePageInner() {
 
   const handleAddActivity = async (activity: Partial<Activity>): Promise<void> => {
     if (!user || !activity.title || !activity.day) {
+      console.error('[Add Activity] Missing required fields:', { hasUser: !!user, title: activity.title, day: activity.day });
       return;
     }
 
-    const token = localStorage.getItem('auth_token');
-    const userName = user.name || localStorage.getItem('user_name');
-    if (!userName) {
-      console.error('User name is required');
-      return;
-    }
-    const response = await fetch('/api/activities', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({
-        ...activity,
-        creatorName: userName,
-      }),
-    });
+    try {
+      const token = localStorage.getItem('auth_token');
+      const userName = user.name || localStorage.getItem('user_name');
+      if (!userName || userName === 'User') {
+        console.error('[Add Activity] User name is required and cannot be "User"');
+        alert('Error: User name is required. Please log in again.');
+        return;
+      }
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Failed to add activity' }));
-      console.error('Failed to add activity:', errorData.error || 'Unknown error');
-      throw new Error(errorData.error || 'Failed to add activity');
-    }
+      console.log('[Add Activity] Creating activity:', { title: activity.title, day: activity.day, creatorName: userName });
 
-    // Use the returned activities to update React state
-    const data = await response.json();
-    if (data.activities) {
-      setActivities(data.activities);
-      // Update SWR cache with the new data
-      mutateActivities({ activities: data.activities }, false);
+      const response = await fetch('/api/activities', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          ...activity,
+          creatorName: userName,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to add activity' }));
+        console.error('[Add Activity] API error:', errorData.error || 'Unknown error', 'Status:', response.status);
+        alert(`Failed to add activity: ${errorData.error || 'Unknown error'}`);
+        throw new Error(errorData.error || 'Failed to add activity');
+      }
+
+      // Use the returned activities to update React state
+      const data = await response.json();
+      console.log('[Add Activity] Success, received activities:', data.activities?.length || 0);
       
-      // Show confirmation toast
-      setShowToast(true);
-      setTimeout(() => {
-        setShowToast(false);
-      }, 2000);
+      if (data.activities) {
+        setActivities(data.activities);
+        // Update SWR cache with the new data
+        mutateActivities({ activities: data.activities }, false);
+        
+        // Show confirmation toast
+        setShowToast(true);
+        setTimeout(() => {
+          setShowToast(false);
+        }, 2000);
+      } else {
+        console.error('[Add Activity] No activities in response');
+        // Refetch activities as fallback
+        await mutateActivities();
+      }
+    } catch (error) {
+      console.error('[Add Activity] Exception:', error);
+      alert(`Error adding activity: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -207,27 +224,27 @@ function HomePageInner() {
     setSelectedInspiration(null);
   };
 
-  const handleVote = async (activityId: string): Promise<void> => {
+  const handleVote = async (activityId: string, type: 'like' | 'dislike'): Promise<void> => {
     if (!user || !tripData) return;
 
     // Get the actual user name from user object or localStorage - MUST NOT be 'User'
     const userName = user.name || localStorage.getItem('user_name');
     
     if (!userName || userName === 'User') {
-      console.error('User name is required and cannot be "User"');
+      console.error('[Vote] User name is required and cannot be "User"');
       return;
     }
 
     const token = localStorage.getItem('auth_token');
     
-    // Call the likes API to toggle like
+    // Call the likes API to toggle like/dislike
     const response = await fetch('/api/likes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ activityId, userName }),
+      body: JSON.stringify({ activityId, userName, type }),
     });
     
     if (response.ok) {
@@ -237,8 +254,8 @@ function HomePageInner() {
         await mutateActivities();
       }
     } else {
-      const errorData = await response.json().catch(() => ({ error: 'Failed to toggle like' }));
-      console.error('Failed to toggle like:', errorData.error || 'Unknown error');
+      const errorData = await response.json().catch(() => ({ error: 'Failed to toggle vote' }));
+      console.error('[Vote] Failed to toggle vote:', errorData.error || 'Unknown error');
     }
   };
 

@@ -15,6 +15,7 @@ export interface Activity {
   creatorName: string;
   createdAt: string;
   likes: string[]; // Array of user names who liked this activity
+  dislikes: string[]; // Array of user names who disliked this activity
   category?: 'restaurant' | 'brunch' | 'sightseeing' | 'bar' | 'cafe' | 'experience' | 'other';
 }
 

@@ -130,6 +130,7 @@ export async function POST(request: NextRequest) {
       creatorName: activityCreatorName,
       createdAt: new Date().toISOString(),
       likes: [],
+      dislikes: [],
       category,
     };
 

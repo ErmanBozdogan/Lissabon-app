@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { activityId, userName } = await request.json();
+    const { activityId, userName, type } = await request.json();
 
     if (!activityId || !userName) {
       return new Response(JSON.stringify({ error: 'Activity ID and user name are required' }), {
@@ -34,6 +34,9 @@ export async function POST(request: NextRequest) {
         },
       });
     }
+
+    // type should be 'like' or 'dislike'
+    const voteType = type === 'dislike' ? 'dislike' : 'like';
 
     // Read the current trip from KV
     let tripData = await kv.get<TripData>(TRIP_KEY);
@@ -59,24 +62,41 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Get the activity and ensure likes array exists
+    // Get the activity and ensure arrays exist
     const activity = { ...tripData.activities[activityIndex] };
     const currentLikes = activity.likes || [];
+    const currentDislikes = activity.dislikes || [];
 
-    // Toggle like: if user name is in likes, remove it; otherwise add it
     let updatedLikes: string[];
-    if (currentLikes.includes(userName)) {
-      // Remove user name from likes
-      updatedLikes = currentLikes.filter(name => name !== userName);
+    let updatedDislikes: string[];
+
+    if (voteType === 'like') {
+      // Handle like: remove from dislikes if present, toggle in likes
+      updatedDislikes = currentDislikes.filter(name => name !== userName);
+      if (currentLikes.includes(userName)) {
+        // Remove from likes (unlike)
+        updatedLikes = currentLikes.filter(name => name !== userName);
+      } else {
+        // Add to likes
+        updatedLikes = [...currentLikes, userName];
+      }
     } else {
-      // Add user name to likes
-      updatedLikes = [...currentLikes, userName];
+      // Handle dislike: remove from likes if present, toggle in dislikes
+      updatedLikes = currentLikes.filter(name => name !== userName);
+      if (currentDislikes.includes(userName)) {
+        // Remove from dislikes (undislike)
+        updatedDislikes = currentDislikes.filter(name => name !== userName);
+      } else {
+        // Add to dislikes
+        updatedDislikes = [...currentDislikes, userName];
+      }
     }
 
-    // Create updated activity with new likes array
+    // Create updated activity with new arrays
     const updatedActivity: Activity = {
       ...activity,
       likes: updatedLikes,
+      dislikes: updatedDislikes,
     };
 
     // Update ONLY this activity in the activities array

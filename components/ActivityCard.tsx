@@ -7,7 +7,7 @@ import EditActivityForm from './EditActivityForm';
 interface ActivityCardProps {
   activity: Activity;
   currentUserId: string;
-  onVote: (activityId: string) => void;
+  onVote: (activityId: string, type: 'like' | 'dislike') => void;
   onDelete: (activityId: string) => void;
   onEdit: (activityId: string, updates: Partial<Activity>) => Promise<void>;
 }
@@ -18,14 +18,22 @@ export default function ActivityCard({ activity, currentUserId, onVote, onDelete
   
   // Get current user name from localStorage
   const currentUserName = typeof window !== 'undefined' ? (localStorage.getItem('user_name') || '') : '';
-  // Check if current user has liked this activity
+  // Check if current user has liked/disliked this activity
   const hasLiked = currentUserName && activity.likes ? activity.likes.includes(currentUserName) : false;
-  // Get like count
+  const hasDisliked = currentUserName && activity.dislikes ? activity.dislikes.includes(currentUserName) : false;
+  // Get counts
   const likeCount = activity.likes ? activity.likes.length : 0;
+  const dislikeCount = activity.dislikes ? activity.dislikes.length : 0;
 
   const handleLike = () => {
     if (currentUserName) {
-      onVote(activity.id);
+      onVote(activity.id, 'like');
+    }
+  };
+
+  const handleDislike = () => {
+    if (currentUserName) {
+      onVote(activity.id, 'dislike');
     }
   };
 
@@ -260,7 +268,18 @@ export default function ActivityCard({ activity, currentUserId, onVote, onDelete
           }`}
         >
           <span className="text-base">👍</span>
-          {likeCount > 0 && <span>({likeCount})</span>}
+          <span>({likeCount})</span>
+        </button>
+        <button
+          onClick={handleDislike}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+            hasDisliked
+              ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 shadow-sm'
+              : 'bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-600 dark:hover:text-rose-400'
+          }`}
+        >
+          <span className="text-base">👎</span>
+          <span>({dislikeCount})</span>
         </button>
       </div>
     </div>

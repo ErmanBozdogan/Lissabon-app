@@ -103,6 +103,7 @@ export const addActivity = (
     creatorName,
     createdAt: new Date().toISOString(),
     likes: [],
+    dislikes: [],
     category,
   };
   data.activities.push(activity);
