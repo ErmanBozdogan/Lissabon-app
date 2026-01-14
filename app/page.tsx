@@ -29,6 +29,7 @@ function HomePageInner() {
   // Store activities in state, fetched from server
   const [activities, setActivities] = useState<Activity[]>([]);
   const [showToast, setShowToast] = useState(false);
+  const [addressCopied, setAddressCopied] = useState(false);
 
   // Fetch static trip data (structure only, no activities)
   const { data: staticTripData, error, mutate } = useSWR<TripData>(
@@ -376,6 +377,68 @@ function HomePageInner() {
               <p className="text-xs text-white/70">
                 Logget ind som <span className="font-medium text-white/90">{user.name || localStorage.getItem('user_name') || 'User'}</span>
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Airbnb Section */}
+        <div className="mb-8">
+          <div className="bg-white dark:bg-gray-900/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50 mb-4">
+            <a
+              href="https://www.airbnb.dk/rooms/1354341134071107243?source_impression_id=p3_1768404535_P3636nb6hNtiEVJt"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 group"
+            >
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-red-600 rounded-xl flex items-center justify-center">
+                  <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm0 22C6.5 22 2 17.5 2 12S6.5 2 12 2s10 4.5 10 10-4.5 10-10 10zm-1-15h2v6h-2zm0 8h2v2h-2z"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-base text-gray-900 dark:text-gray-50 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+                  Our Airbnb
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+                  View accommodation details
+                </p>
+              </div>
+              <svg className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
+
+          {/* Address */}
+          <div className="bg-white dark:bg-gray-900/50 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800/50">
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">
+              Address
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value="Calçada de Salvador Correia de Sá 4, Lisbon, Lisbon 1200-066"
+                className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent transition-all text-sm"
+                onClick={(e) => {
+                  e.currentTarget.select();
+                  navigator.clipboard.writeText(e.currentTarget.value);
+                  setAddressCopied(true);
+                  setTimeout(() => setAddressCopied(false), 2000);
+                }}
+              />
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText('Calçada de Salvador Correia de Sá 4, Lisbon, Lisbon 1200-066');
+                  setAddressCopied(true);
+                  setTimeout(() => setAddressCopied(false), 2000);
+                }}
+                className="px-4 py-2.5 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
+              >
+                {addressCopied ? 'Copied!' : 'Copy'}
+              </button>
             </div>
           </div>
         </div>
