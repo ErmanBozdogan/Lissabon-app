@@ -259,8 +259,18 @@ export default function ActivityCard({ activity, currentUserId, onVote, onDelete
               : 'bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 hover:text-emerald-600 dark:hover:text-emerald-400'
           }`}
         >
-          <span className="text-base">👍</span>
-          <span>{yesVotes}</span>
+          <span className="flex items-center gap-0.5">
+            {yesVotes > 0 ? (
+              <>
+                {Array.from({ length: Math.min(yesVotes, 5) }).map((_, i) => (
+                  <span key={i} className="text-base">👍</span>
+                ))}
+                {yesVotes > 5 && <span className="text-xs ml-0.5">+{yesVotes - 5}</span>}
+              </>
+            ) : (
+              <span className="text-base">👍</span>
+            )}
+          </span>
         </button>
         <button
           onClick={() => handleVote('no')}
@@ -270,8 +280,18 @@ export default function ActivityCard({ activity, currentUserId, onVote, onDelete
               : 'bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:text-rose-600 dark:hover:text-rose-400'
           }`}
         >
-          <span className="text-base">👎</span>
-          <span>{noVotes}</span>
+          <span className="flex items-center gap-0.5">
+            {noVotes > 0 ? (
+              <>
+                {Array.from({ length: Math.min(noVotes, 5) }).map((_, i) => (
+                  <span key={i} className="text-base">👎</span>
+                ))}
+                {noVotes > 5 && <span className="text-xs ml-0.5">+{noVotes - 5}</span>}
+              </>
+            ) : (
+              <span className="text-base">👎</span>
+            )}
+          </span>
         </button>
       </div>
     </div>

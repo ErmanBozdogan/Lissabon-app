@@ -18,13 +18,13 @@ const getEnglishWeekday = (dateString: string): string => {
 };
 
 const getDefaultTripData = (): TripData => {
-  const dates = ['2025-02-11', '2025-02-12', '2025-02-13', '2025-02-14', '2025-02-15'];
+  const dates = ['2026-02-11', '2026-02-12', '2026-02-13', '2026-02-14', '2026-02-15'];
   const danishMonths = ['januar', 'februar', 'marts', 'april', 'maj', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'december'];
   
   return {
     tripName: 'Lisbon Trip',
-    startDate: '2025-02-11',
-    endDate: '2025-02-15',
+    startDate: '2026-02-11',
+    endDate: '2026-02-15',
     days: dates.map(dateString => {
       const date = new Date(dateString + 'T00:00:00');
       const day = date.getDate();
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Check if trip data has Danish weekdays and regenerate with English weekdays
+    // Check if trip data has Danish weekdays or wrong year (2025 instead of 2026)
     const hasDanishWeekday = tripData.days.some(day => 
       day.label.includes('Mandag') || 
       day.label.includes('Tirsdag') || 
@@ -77,8 +77,10 @@ export async function GET(request: NextRequest) {
       day.label.includes('Søndag')
     );
 
-    if (hasDanishWeekday) {
-      // Regenerate days with English weekdays, preserving activities
+    const hasWrongYear = tripData.startDate?.startsWith('2025') || tripData.days.some(day => day.date.startsWith('2025'));
+
+    if (hasDanishWeekday || hasWrongYear) {
+      // Regenerate days with English weekdays and correct year (2026), preserving activities
       const defaultTrip = getDefaultTripData();
       tripData.days = defaultTrip.days;
       tripData.startDate = defaultTrip.startDate;
