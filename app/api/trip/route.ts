@@ -17,18 +17,31 @@ import { v4 as uuidv4 } from 'uuid';
  * - This is a temporary stateless fix for Vercel compatibility
  * - Persistence can be added later (e.g., database)
  */
+const getDanishWeekday = (dateString: string): string => {
+  const date = new Date(dateString + 'T00:00:00');
+  const dayOfWeek = date.getDay();
+  const danishWeekdays = ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'];
+  return danishWeekdays[dayOfWeek];
+};
+
 const getStaticTripData = (): TripData => {
+  const dates = ['2025-02-11', '2025-02-12', '2025-02-13', '2025-02-14', '2025-02-15'];
+  const danishMonths = ['januar', 'februar', 'marts', 'april', 'maj', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'december'];
+  
   return {
     tripName: 'Lisbon Trip',
     startDate: '2025-02-11',
     endDate: '2025-02-15',
-    days: [
-      { date: '2025-02-11', label: 'Onsdag, 11. februar' },
-      { date: '2025-02-12', label: 'Torsdag, 12. februar' },
-      { date: '2025-02-13', label: 'Fredag, 13. februar' },
-      { date: '2025-02-14', label: 'Lørdag, 14. februar' },
-      { date: '2025-02-15', label: 'Søndag, 15. februar' },
-    ],
+    days: dates.map(dateString => {
+      const date = new Date(dateString + 'T00:00:00');
+      const day = date.getDate();
+      const month = danishMonths[date.getMonth()];
+      const weekday = getDanishWeekday(dateString);
+      return {
+        date: dateString,
+        label: `${weekday}, ${day}. ${month}`
+      };
+    }),
     activities: [],
     users: [],
     inviteToken: uuidv4(), // Generate a token for compatibility, but not used in password auth

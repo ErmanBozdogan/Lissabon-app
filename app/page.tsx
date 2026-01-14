@@ -28,6 +28,7 @@ function HomePageInner() {
   const [isLoading, setIsLoading] = useState(true);
   // Store activities in state, fetched from server
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [showToast, setShowToast] = useState(false);
 
   // Fetch static trip data (structure only, no activities)
   const { data: staticTripData, error, mutate } = useSWR<TripData>(
@@ -78,7 +79,7 @@ function HomePageInner() {
       // No need to verify with server - token presence = authenticated
       if (token) {
         // Get stored user info from localStorage (set during join)
-        const storedName = localStorage.getItem('user_name') || 'User';
+        const storedName = localStorage.getItem('user_name') || '';
         const storedId = localStorage.getItem('user_id') || 'user';
         console.log('[AUTH] Stored user info:', { id: storedId, name: storedName });
         
@@ -165,6 +166,12 @@ function HomePageInner() {
       setActivities(data.activities);
       // Update SWR cache with the new data
       mutateActivities({ activities: data.activities }, false);
+      
+      // Show confirmation toast
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+      }, 2000);
     }
   };
 
@@ -316,6 +323,14 @@ function HomePageInner() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20">
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 transition-opacity duration-300">
+          <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-xl shadow-lg font-medium">
+            Hold kæft det bliver godt
+          </div>
+        </div>
+      )}
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* Header with Background Image */}
         <div className="relative rounded-2xl shadow-lg mb-8 sticky top-4 z-10 overflow-hidden min-h-[280px]">
@@ -345,13 +360,21 @@ function HomePageInner() {
                   {tripData.tripName}
                 </h1>
                 <p className="text-xl text-white/95 font-semibold drop-shadow-lg mb-1">
-                  {tripData.days[0].label.split(',')[0]} {tripData.days[0].label.split(',')[1]?.trim()} - {tripData.days[tripData.days.length - 1].label.split(',')[0]} {tripData.days[tripData.days.length - 1].label.split(',')[1]?.trim()}
+                  {(() => {
+                    const startDate = new Date(tripData.days[0].date);
+                    const endDate = new Date(tripData.days[tripData.days.length - 1].date);
+                    const startDay = startDate.getDate();
+                    const endDay = endDate.getDate();
+                    const startMonth = startDate.toLocaleDateString('en-US', { month: 'long' });
+                    const endMonth = endDate.toLocaleDateString('en-US', { month: 'long' });
+                    return `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
+                  })()}
                 </p>
               </div>
             </div>
             <div className="pt-4 border-t border-white/20">
               <p className="text-xs text-white/70">
-                Logget ind som <span className="font-medium text-white/90">{user.name}</span>
+                Logget ind som <span className="font-medium text-white/90">{user.name || localStorage.getItem('user_name') || 'User'}</span>
               </p>
             </div>
           </div>
