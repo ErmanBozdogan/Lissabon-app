@@ -472,7 +472,7 @@ function HomePageInner() {
           
           {/* Content */}
           <div className="relative z-10 p-8 pt-[42px] h-full flex flex-col justify-between">
-            <div className="mb-4">
+            <div className="mb-4 mt-10">
               <h1 className="text-4xl font-bold text-white tracking-tight mb-3 drop-shadow-2xl text-center">
                 {tripData.tripName}
               </h1>
