@@ -29,7 +29,6 @@ function HomePageInner() {
   // Store activities in state, fetched from server
   const [activities, setActivities] = useState<Activity[]>([]);
   const [showToast, setShowToast] = useState(false);
-  const [addressCopied, setAddressCopied] = useState(false);
 
   // Fetch static trip data (structure only, no activities)
   const { data: staticTripData, error, mutate } = useSWR<TripData>(
@@ -431,22 +430,15 @@ function HomePageInner() {
                 readOnly
                 value="Calçada de Salvador Correia de Sá 4, Lisbon, Lisbon 1200-066"
                 className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent transition-all text-sm"
-                onClick={(e) => {
-                  e.currentTarget.select();
-                  navigator.clipboard.writeText(e.currentTarget.value);
-                  setAddressCopied(true);
-                  setTimeout(() => setAddressCopied(false), 2000);
-                }}
               />
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText('Calçada de Salvador Correia de Sá 4, Lisbon, Lisbon 1200-066');
-                  setAddressCopied(true);
-                  setTimeout(() => setAddressCopied(false), 2000);
+                  const address = encodeURIComponent('Calçada de Salvador Correia de Sá 4, Lisbon, Lisbon 1200-066');
+                  window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
                 }}
                 className="px-4 py-2.5 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
               >
-                {addressCopied ? 'Copied!' : 'Copy'}
+                Open in Maps
               </button>
             </div>
           </div>
