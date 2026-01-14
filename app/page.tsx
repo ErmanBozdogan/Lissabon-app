@@ -408,12 +408,12 @@ function HomePageInner() {
             </h3>
             <div className="grid gap-4 md:grid-cols-2">
               {[
-                { name: 'Belém Tower', description: 'Historic tower and UNESCO World Heritage site', location: 'Avenida Brasília' },
-                { name: 'Jerónimos Monastery', description: 'Manueline architecture masterpiece', location: 'Praça do Império' },
-                { name: 'São Jorge Castle', description: 'Medieval castle with panoramic city views', location: 'Castelo de São Jorge' },
-                { name: 'Alfama District', description: 'Historic neighborhood with narrow streets', location: 'Alfama' },
-                { name: 'Tram 28', description: 'Iconic tram route through historic neighborhoods', location: 'Various stops' },
-                { name: 'Lisbon Oceanarium', description: 'One of the largest aquariums in Europe', location: 'Parque das Nações' },
+                { name: 'Belém Tower', description: 'Historic tower and UNESCO World Heritage site', location: 'Avenida Brasília, Lisboa', mapsUrl: 'https://maps.google.com/?q=Belem+Tower+Lisbon' },
+                { name: 'Jerónimos Monastery', description: 'Manueline architecture masterpiece', location: 'Praça do Império, Lisboa', mapsUrl: 'https://maps.google.com/?q=Jeronimos+Monastery+Lisbon' },
+                { name: 'São Jorge Castle', description: 'Medieval castle with panoramic city views', location: 'Castelo de São Jorge, Lisboa', mapsUrl: 'https://maps.google.com/?q=Sao+Jorge+Castle+Lisbon' },
+                { name: 'Alfama District', description: 'Historic neighborhood with narrow streets', location: 'Alfama, Lisboa', mapsUrl: 'https://maps.google.com/?q=Alfama+Lisbon' },
+                { name: 'Tram 28', description: 'Iconic tram route through historic neighborhoods', location: 'Various stops, Lisboa', mapsUrl: 'https://maps.google.com/?q=Tram+28+Lisbon' },
+                { name: 'Lisbon Oceanarium', description: 'One of the largest aquariums in Europe', location: 'Parque das Nações, Lisboa', mapsUrl: 'https://maps.google.com/?q=Lisbon+Oceanarium' },
               ].map((item, idx) => (
                 <div
                   key={idx}
@@ -426,9 +426,14 @@ function HomePageInner() {
                     {item.description}
                   </p>
                   {item.location && (
-                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                    <a
+                      href={item.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1"
+                    >
                       📍 {item.location}
-                    </p>
+                    </a>
                   )}
                 </div>
               ))}
@@ -436,19 +441,19 @@ function HomePageInner() {
           </div>
 
           {/* Restaurants */}
-          <div>
+          <div className="mb-8">
             <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
               <span className="text-2xl">🍽️</span>
               Restauranter
             </h3>
             <div className="grid gap-4 md:grid-cols-2">
               {[
-                { name: 'Time Out Market', description: 'Food hall with local and international cuisine', location: 'Mercado da Ribeira' },
-                { name: 'Cervejaria Ramiro', description: 'Famous seafood restaurant', location: 'Avenida Almirante Reis' },
-                { name: 'Pasteis de Belém', description: 'Original pastel de nata bakery', location: 'Rua de Belém' },
-                { name: 'Taberna da Rua das Flores', description: 'Traditional Portuguese tapas', location: 'Rua das Flores' },
-                { name: 'A Cevicheria', description: 'Modern Peruvian-inspired seafood', location: 'Rua Dom Pedro V' },
-                { name: 'Bairro do Avillez', description: 'Celebrity chef José Avillez restaurant', location: 'Rua Nova da Trindade' },
+                { name: 'Time Out Market', description: 'Food hall with local and international cuisine', location: 'Mercado da Ribeira, Lisboa', mapsUrl: 'https://maps.google.com/?q=Time+Out+Market+Lisbon' },
+                { name: 'Cervejaria Ramiro', description: 'Famous seafood restaurant', location: 'Avenida Almirante Reis, Lisboa', mapsUrl: 'https://maps.google.com/?q=Cervejaria+Ramiro+Lisbon' },
+                { name: 'Pasteis de Belém', description: 'Original pastel de nata bakery', location: 'Rua de Belém, Lisboa', mapsUrl: 'https://maps.google.com/?q=Pasteis+de+Belem+Lisbon' },
+                { name: 'Taberna da Rua das Flores', description: 'Traditional Portuguese tapas', location: 'Rua das Flores, Lisboa', mapsUrl: 'https://maps.google.com/?q=Taberna+da+Rua+das+Flores+Lisbon' },
+                { name: 'A Cevicheria', description: 'Modern Peruvian-inspired seafood', location: 'Rua Dom Pedro V, Lisboa', mapsUrl: 'https://maps.google.com/?q=A+Cevicheria+Lisbon' },
+                { name: 'Bairro do Avillez', description: 'Celebrity chef José Avillez restaurant', location: 'Rua Nova da Trindade, Lisboa', mapsUrl: 'https://maps.google.com/?q=Bairro+do+Avillez+Lisbon' },
               ].map((item, idx) => (
                 <div
                   key={idx}
@@ -461,9 +466,94 @@ function HomePageInner() {
                     {item.description}
                   </p>
                   {item.location && (
-                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                    <a
+                      href={item.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1"
+                    >
                       📍 {item.location}
-                    </p>
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Brunch */}
+          <div className="mb-8">
+            <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+              <span className="text-2xl">🥐</span>
+              Brunch
+            </h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              {[
+                { name: 'Heim Cafe', description: 'Popular brunch spot with great coffee and avocado toast', location: 'Rua Santos-O-Velho, Lisboa', mapsUrl: 'https://maps.google.com/?q=Heim+Cafe+Lisbon' },
+                { name: 'The Mill', description: 'Australian-style brunch with excellent pancakes', location: 'Rua do Poço dos Negros, Lisboa', mapsUrl: 'https://maps.google.com/?q=The+Mill+Lisbon' },
+                { name: 'Dear Breakfast', description: 'Trendy brunch cafe with Instagram-worthy dishes', location: 'Rua Gaivotas, Lisboa', mapsUrl: 'https://maps.google.com/?q=Dear+Breakfast+Lisbon' },
+                { name: 'Nicolau Lisboa', description: 'Cozy brunch spot with Portuguese and international options', location: 'Rua de São Nicolau, Lisboa', mapsUrl: 'https://maps.google.com/?q=Nicolau+Lisboa' },
+                { name: 'Fauna & Flora', description: 'Plant-based brunch with healthy options', location: 'Rua da Esperança, Lisboa', mapsUrl: 'https://maps.google.com/?q=Fauna+Flora+Lisbon' },
+                { name: 'Comoba', description: 'Modern brunch with fresh ingredients and great coffee', location: 'Rua da Rosa, Lisboa', mapsUrl: 'https://maps.google.com/?q=Comoba+Lisbon' },
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white dark:bg-gray-900/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50"
+                >
+                  <h4 className="font-semibold text-base text-gray-900 dark:text-gray-50 mb-1.5">
+                    {item.name}
+                  </h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
+                    {item.description}
+                  </p>
+                  {item.location && (
+                    <a
+                      href={item.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1"
+                    >
+                      📍 {item.location}
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Breakfast */}
+          <div>
+            <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+              <span className="text-2xl">☕</span>
+              Morgenmad
+            </h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              {[
+                { name: 'Copenhagen Coffee Lab', description: 'Danish-style coffee and pastries', location: 'Multiple locations, Lisboa', mapsUrl: 'https://maps.google.com/?q=Copenhagen+Coffee+Lab+Lisbon' },
+                { name: 'Fábrica Coffee Roasters', description: 'Specialty coffee with excellent breakfast options', location: 'Rua das Portas de Santo Antão, Lisboa', mapsUrl: 'https://maps.google.com/?q=Fabrica+Coffee+Roasters+Lisbon' },
+                { name: 'Café Tati', description: 'Traditional Portuguese breakfast with pastries', location: 'Rua Nova do Carvalho, Lisboa', mapsUrl: 'https://maps.google.com/?q=Cafe+Tati+Lisbon' },
+                { name: 'Café Brasileira', description: 'Historic cafe with traditional Portuguese breakfast', location: 'Rua Garrett, Lisboa', mapsUrl: 'https://maps.google.com/?q=Cafe+Brasileira+Lisbon' },
+                { name: 'Casa Portuguesa do Pastel de Bacalhau', description: 'Traditional cod cakes and coffee', location: 'Rua Augusta, Lisboa', mapsUrl: 'https://maps.google.com/?q=Casa+Portuguesa+do+Pastel+de+Bacalhau+Lisbon' },
+                { name: 'Manteigaria', description: 'Fresh pastel de nata and coffee', location: 'Rua do Loreto, Lisboa', mapsUrl: 'https://maps.google.com/?q=Manteigaria+Lisbon' },
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white dark:bg-gray-900/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50"
+                >
+                  <h4 className="font-semibold text-base text-gray-900 dark:text-gray-50 mb-1.5">
+                    {item.name}
+                  </h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
+                    {item.description}
+                  </p>
+                  {item.location && (
+                    <a
+                      href={item.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1"
+                    >
+                      📍 {item.location}
+                    </a>
                   )}
                 </div>
               ))}
