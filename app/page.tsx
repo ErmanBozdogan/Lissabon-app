@@ -101,6 +101,8 @@ function HomePageInner() {
         };
         
         // Optionally verify with server (but don't fail if it doesn't respond)
+        // IMPORTANT: Never overwrite localStorage user_name with "User" from server
+        // The server returns generic "User" - we must use localStorage as source of truth
         try {
           const response = await fetch('/api/auth/me', {
             headers: {
@@ -109,14 +111,22 @@ function HomePageInner() {
           });
           if (response.ok) {
             const data = await response.json();
-            // Use server response if available, otherwise use basic user
+            // Use server response for token validation, but ALWAYS use localStorage for name
+            // Server returns generic "User" - we must preserve the actual name from localStorage
             if (data.user) {
-              // Update stored name if server provides it
-              if (data.user.name) {
-                localStorage.setItem('user_name', data.user.name);
-              }
-              console.log('[AUTH] Setting user from server response:', data.user);
-              setUser(data.user);
+              // Server check passed - token is valid
+              // BUT: Server returns generic "User" - we MUST use localStorage name
+              // NEVER overwrite localStorage with "User" from server
+              // Create user object ALWAYS using localStorage name (source of truth)
+              const userWithActualName: User = {
+                ...data.user,
+                id: storedId,
+                name: storedName, // ALWAYS use localStorage name, never server's "User"
+                token: token, // Use token from localStorage
+              };
+              
+              console.log('[AUTH] Setting user with actual name from localStorage:', userWithActualName);
+              setUser(userWithActualName);
             } else {
               console.log('[AUTH] Setting user from localStorage:', user);
               setUser(user);
@@ -155,9 +165,15 @@ function HomePageInner() {
 
     try {
       const token = localStorage.getItem('auth_token');
-      const userName = user.name || localStorage.getItem('user_name');
-      if (!userName || userName === 'User') {
-        console.error('[Add Activity] User name is required and cannot be "User"');
+      // ALWAYS get userName from localStorage first (source of truth)
+      // user.name might be "User" from server - we must use localStorage
+      const userName = localStorage.getItem('user_name') || user.name;
+      if (!userName || userName === 'User' || userName.trim() === '') {
+        console.error('[Add Activity] User name is required and cannot be "User"', { 
+          userName, 
+          userFromState: user.name,
+          localStorageName: localStorage.getItem('user_name')
+        });
         alert('Error: User name is required. Please log in again.');
         return;
       }
@@ -240,11 +256,17 @@ function HomePageInner() {
   const handleVote = async (activityId: string, type: 'like' | 'dislike'): Promise<void> => {
     if (!user || !tripData) return;
 
-    // Get the actual user name from user object or localStorage - MUST NOT be 'User'
-    const userName = user.name || localStorage.getItem('user_name');
+    // ALWAYS get userName from localStorage first (source of truth)
+    // user.name might be "User" from server - we must use localStorage
+    const userName = localStorage.getItem('user_name') || user.name;
     
-    if (!userName || userName === 'User') {
-      console.error('[Vote] User name is required and cannot be "User"');
+    if (!userName || userName === 'User' || userName.trim() === '') {
+      console.error('[Vote] User name is required and cannot be "User"', {
+        userName,
+        userFromState: user.name,
+        localStorageName: localStorage.getItem('user_name')
+      });
+      alert('Error: User name is required. Please log in again.');
       return;
     }
 

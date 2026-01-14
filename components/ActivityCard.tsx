@@ -29,14 +29,20 @@ export default function ActivityCard({ activity, currentUserId, onVote, onDelete
   const dislikeCount = dislikes.length;
 
   const handleLike = () => {
-    if (currentUserName) {
+    if (currentUserName && currentUserName !== 'User' && currentUserName.trim() !== '') {
       onVote(activity.id, 'like');
+    } else {
+      console.error('[ActivityCard] Cannot like: invalid user name', { currentUserName });
+      alert('Error: User name is required. Please log in again.');
     }
   };
 
   const handleDislike = () => {
-    if (currentUserName) {
+    if (currentUserName && currentUserName !== 'User' && currentUserName.trim() !== '') {
       onVote(activity.id, 'dislike');
+    } else {
+      console.error('[ActivityCard] Cannot dislike: invalid user name', { currentUserName });
+      alert('Error: User name is required. Please log in again.');
     }
   };
 

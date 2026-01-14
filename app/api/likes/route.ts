@@ -35,6 +35,17 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Reject "User" as userName - it's a placeholder, not a real name
+    if (userName === 'User' || userName.trim() === '') {
+      return new Response(JSON.stringify({ error: 'Invalid user name. Please log in again.' }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
+
     // type should be 'like' or 'dislike'
     const voteType = type === 'dislike' ? 'dislike' : 'like';
 
