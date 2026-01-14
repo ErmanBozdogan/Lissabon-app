@@ -16,7 +16,10 @@ export default function ActivityCard({ activity, currentUserId, onVote, onDelete
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   
-  const userVote = activity.votes.find(v => v.userId === currentUserId);
+  // Get current user name from localStorage for vote checking
+  const currentUserName = typeof window !== 'undefined' ? (localStorage.getItem('user_name') || 'User') : 'User';
+  // Check vote by userName (unique identifier) instead of userId
+  const userVote = activity.votes.find(v => v.userName === currentUserName);
   const yesVotes = activity.votes.filter(v => v.vote === 'yes').length;
   const noVotes = activity.votes.filter(v => v.vote === 'no').length;
 

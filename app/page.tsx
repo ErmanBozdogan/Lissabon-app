@@ -29,6 +29,8 @@ function HomePageInner() {
   // Store activities in state, fetched from server
   const [activities, setActivities] = useState<Activity[]>([]);
   const [showToast, setShowToast] = useState(false);
+  const [showDaySelector, setShowDaySelector] = useState(false);
+  const [selectedInspiration, setSelectedInspiration] = useState<{ name: string; description?: string; location?: string; category?: string } | null>(null);
 
   // Fetch static trip data (structure only, no activities)
   const { data: staticTripData, error, mutate } = useSWR<TripData>(
@@ -179,17 +181,43 @@ function HomePageInner() {
     }
   };
 
+  const handleAddInspiration = (inspiration: { name: string; description?: string; location?: string; category?: string }) => {
+    setSelectedInspiration(inspiration);
+    setShowDaySelector(true);
+  };
+
+  const handleConfirmInspiration = async (day: string) => {
+    if (!selectedInspiration || !tripData) return;
+
+    const category = (selectedInspiration.category || 'sightseeing') as 'restaurant' | 'brunch' | 'sightseeing' | 'bar' | 'cafe' | 'experience' | 'other';
+
+    await handleAddActivity({
+      title: selectedInspiration.name,
+      description: selectedInspiration.description,
+      location: selectedInspiration.location,
+      day: day,
+      category: category,
+    });
+
+    setShowDaySelector(false);
+    setSelectedInspiration(null);
+  };
+
   const handleVote = async (activityId: string, vote: 'yes' | 'no'): Promise<void> => {
     if (!user || !tripData) return;
 
+    // Get the actual user name from user object or localStorage
+    const userName = user.name || localStorage.getItem('user_name') || 'User';
+    
     const activity = activities.find(a => a.id === activityId);
-    const currentVote = activity?.votes.find(v => v.userId === user.id);
+    // Check vote by userName (unique identifier) instead of userId
+    const currentVote = activity?.votes.find(v => v.userName === userName);
 
     const token = localStorage.getItem('auth_token');
     
     // If clicking the same vote, remove it
     if (currentVote?.vote === vote) {
-      const response = await fetch(`/api/votes?activityId=${activityId}`, {
+      const response = await fetch(`/api/votes?activityId=${activityId}&userName=${encodeURIComponent(userName)}`, {
         method: 'DELETE',
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
@@ -210,7 +238,7 @@ function HomePageInner() {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ activityId, vote }),
+        body: JSON.stringify({ activityId, vote, userName }),
       });
       if (response.ok) {
         const data = await response.json();
@@ -332,6 +360,37 @@ function HomePageInner() {
         <div className="fixed top-4 right-4 z-50 transition-all duration-300 animate-in fade-in slide-in-from-top-2">
           <div className="bg-green-600 text-white px-6 py-3 rounded-2xl shadow-xl font-medium text-xl backdrop-blur-sm">
             Rigtig godt valg
+          </div>
+        </div>
+      )}
+
+      {/* Day Selector Modal */}
+      {showDaySelector && selectedInspiration && tripData && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => { setShowDaySelector(false); setSelectedInspiration(null); }}>
+          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-md w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-50 mb-4">
+              Add &quot;{selectedInspiration.name}&quot; to calendar
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Select which day to add this activity:
+            </p>
+            <div className="space-y-2 mb-6">
+              {tripData.days.map((day) => (
+                <button
+                  key={day.date}
+                  onClick={() => handleConfirmInspiration(day.date)}
+                  className="w-full text-left px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors border border-gray-200 dark:border-gray-700"
+                >
+                  <span className="font-medium text-gray-900 dark:text-gray-50">{day.label}</span>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => { setShowDaySelector(false); setSelectedInspiration(null); }}
+              className="w-full px-4 py-2.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-50 font-medium rounded-xl transition-colors"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
@@ -542,11 +601,17 @@ function HomePageInner() {
                       href={item.mapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1"
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 mb-3"
                     >
                       📍 {item.location}
                     </a>
                   )}
+                  <button
+                    onClick={() => handleAddInspiration({ ...item, category: 'sightseeing' })}
+                    className="w-full mt-3 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
+                  >
+                    Add to activity
+                  </button>
                 </div>
               ))}
             </div>
@@ -582,11 +647,17 @@ function HomePageInner() {
                       href={item.mapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1"
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 mb-3"
                     >
                       📍 {item.location}
                     </a>
                   )}
+                  <button
+                    onClick={() => handleAddInspiration({ ...item, category: 'restaurant' })}
+                    className="w-full mt-3 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
+                  >
+                    Add to activity
+                  </button>
                 </div>
               ))}
             </div>
@@ -622,11 +693,17 @@ function HomePageInner() {
                       href={item.mapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1"
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 mb-3"
                     >
                       📍 {item.location}
                     </a>
                   )}
+                  <button
+                    onClick={() => handleAddInspiration({ ...item, category: 'brunch' })}
+                    className="w-full mt-3 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
+                  >
+                    Add to activity
+                  </button>
                 </div>
               ))}
             </div>
@@ -662,11 +739,17 @@ function HomePageInner() {
                       href={item.mapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1"
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 mb-3"
                     >
                       📍 {item.location}
                     </a>
                   )}
+                  <button
+                    onClick={() => handleAddInspiration({ ...item, category: 'cafe' })}
+                    className="w-full mt-3 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
+                  >
+                    Add to activity
+                  </button>
                 </div>
               ))}
             </div>

@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { activityId, vote } = await request.json();
+    const { activityId, vote, userName } = await request.json();
 
     if (!activityId || !vote) {
       return NextResponse.json(
@@ -29,6 +29,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Use userName from request (client-provided) as unique identifier
+    // Fall back to user.name if not provided (backward compatibility)
+    const uniqueUserName = userName || user.name || 'User';
+    const uniqueUserId = user.id || 'user';
+
     const activities = await getActivities();
     const activityIndex = activities.findIndex(a => a.id === activityId);
 
@@ -40,10 +45,10 @@ export async function POST(request: NextRequest) {
     }
 
     const activity = activities[activityIndex];
-    // Remove existing vote from this user
-    activity.votes = activity.votes.filter(v => v.userId !== user.id);
-    // Add new vote
-    activity.votes.push({ userId: user.id, userName: user.name, vote });
+    // Remove existing vote from this user (check by userName for uniqueness)
+    activity.votes = activity.votes.filter(v => v.userName !== uniqueUserName);
+    // Add new vote with userName as unique identifier
+    activity.votes.push({ userId: uniqueUserId, userName: uniqueUserName, vote });
 
     const updatedActivities = [...activities];
     updatedActivities[activityIndex] = activity;
@@ -72,6 +77,7 @@ export async function DELETE(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const activityId = searchParams.get('activityId');
+    const userName = searchParams.get('userName');
 
     if (!activityId) {
       return NextResponse.json(
@@ -79,6 +85,9 @@ export async function DELETE(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Use userName from query params (client-provided) as unique identifier
+    const uniqueUserName = userName || user.name || 'User';
 
     const activities = await getActivities();
     const activityIndex = activities.findIndex(a => a.id === activityId);
@@ -91,8 +100,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     const activity = activities[activityIndex];
-    // Remove vote from this user
-    activity.votes = activity.votes.filter(v => v.userId !== user.id);
+    // Remove vote from this user (check by userName for uniqueness)
+    activity.votes = activity.votes.filter(v => v.userName !== uniqueUserName);
 
     const updatedActivities = [...activities];
     updatedActivities[activityIndex] = activity;
