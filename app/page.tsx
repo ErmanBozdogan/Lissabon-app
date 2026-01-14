@@ -492,7 +492,7 @@ function HomePageInner() {
         {/* Activities Header */}
         <div className="mb-6">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-50 tracking-tight">
-            What's the plan?
+            What&apos;s the plan?
           </h2>
         </div>
 
