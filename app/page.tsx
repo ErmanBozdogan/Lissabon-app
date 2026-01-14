@@ -325,8 +325,8 @@ function HomePageInner() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-20">
       {/* Toast Notification */}
       {showToast && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 transition-opacity duration-300">
-          <div className="bg-green-600 text-white px-12 py-6 rounded-xl shadow-lg font-medium text-2xl">
+        <div className="fixed top-4 right-4 z-50 transition-all duration-300 animate-in fade-in slide-in-from-top-2">
+          <div className="bg-green-600 text-white px-8 py-4 rounded-2xl shadow-xl font-medium text-xl backdrop-blur-sm">
             kæft det bliver godt
           </div>
         </div>
