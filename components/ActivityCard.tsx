@@ -18,12 +18,15 @@ export default function ActivityCard({ activity, currentUserId, onVote, onDelete
   
   // Get current user name from localStorage
   const currentUserName = typeof window !== 'undefined' ? (localStorage.getItem('user_name') || '') : '';
+  // Ensure arrays exist (defensive check)
+  const likes = activity.likes || [];
+  const dislikes = activity.dislikes || [];
   // Check if current user has liked/disliked this activity
-  const hasLiked = currentUserName && activity.likes ? activity.likes.includes(currentUserName) : false;
-  const hasDisliked = currentUserName && activity.dislikes ? activity.dislikes.includes(currentUserName) : false;
+  const hasLiked = currentUserName ? likes.includes(currentUserName) : false;
+  const hasDisliked = currentUserName ? dislikes.includes(currentUserName) : false;
   // Get counts
-  const likeCount = activity.likes ? activity.likes.length : 0;
-  const dislikeCount = activity.dislikes ? activity.dislikes.length : 0;
+  const likeCount = likes.length;
+  const dislikeCount = dislikes.length;
 
   const handleLike = () => {
     if (currentUserName) {

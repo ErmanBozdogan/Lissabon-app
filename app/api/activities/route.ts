@@ -56,7 +56,14 @@ export async function GET(request: NextRequest) {
     }
 
     const tripData = await kv.get<TripData>(TRIP_KEY);
-    const activities = tripData?.activities || [];
+    let activities = tripData?.activities || [];
+    
+    // Migrate existing activities to ensure they have dislikes array
+    activities = activities.map(activity => ({
+      ...activity,
+      likes: activity.likes || [],
+      dislikes: activity.dislikes || [],
+    }));
     
     return new Response(JSON.stringify({ activities }), {
       headers: {

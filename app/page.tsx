@@ -56,7 +56,13 @@ function HomePageInner() {
 
   useEffect(() => {
     if (activitiesData?.activities) {
-      setActivities(activitiesData.activities);
+      // Ensure all activities have likes and dislikes arrays
+      const migratedActivities = activitiesData.activities.map((activity: Activity) => ({
+        ...activity,
+        likes: activity.likes || [],
+        dislikes: activity.dislikes || [],
+      }));
+      setActivities(migratedActivities);
     }
   }, [activitiesData]);
 
@@ -181,10 +187,17 @@ function HomePageInner() {
       const data = await response.json();
       console.log('[Add Activity] Success, received activities:', data.activities?.length || 0);
       
-      if (data.activities) {
-        setActivities(data.activities);
+      if (data.activities && Array.isArray(data.activities)) {
+        // Ensure all activities have dislikes array
+        const migratedActivities = data.activities.map((activity: Activity) => ({
+          ...activity,
+          likes: activity.likes || [],
+          dislikes: activity.dislikes || [],
+        }));
+        
+        setActivities(migratedActivities);
         // Update SWR cache with the new data
-        mutateActivities({ activities: data.activities }, false);
+        mutateActivities({ activities: migratedActivities }, false);
         
         // Show confirmation toast
         setShowToast(true);
@@ -192,7 +205,7 @@ function HomePageInner() {
           setShowToast(false);
         }, 2000);
       } else {
-        console.error('[Add Activity] No activities in response');
+        console.error('[Add Activity] No activities in response, refetching...');
         // Refetch activities as fallback
         await mutateActivities();
       }
