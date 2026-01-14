@@ -8,11 +8,11 @@ const getDefaultTripData = (): TripData => {
   const dates = ['2025-02-11', '2025-02-12', '2025-02-13', '2025-02-14', '2025-02-15'];
   const danishMonths = ['januar', 'februar', 'marts', 'april', 'maj', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'december'];
   
-  const getDanishWeekday = (dateString: string): string => {
+  const getEnglishWeekday = (dateString: string): string => {
     const date = new Date(dateString + 'T00:00:00');
     const dayOfWeek = date.getDay();
-    const danishWeekdays = ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'];
-    return danishWeekdays[dayOfWeek];
+    const englishWeekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return englishWeekdays[dayOfWeek];
   };
 
   return {
@@ -23,7 +23,7 @@ const getDefaultTripData = (): TripData => {
       const date = new Date(dateString + 'T00:00:00');
       const day = date.getDate();
       const month = danishMonths[date.getMonth()];
-      const weekday = getDanishWeekday(dateString);
+      const weekday = getEnglishWeekday(dateString);
       return {
         date: dateString,
         label: `${weekday}, ${day}. ${month}`

@@ -10,11 +10,11 @@ export const runtime = 'nodejs';
 
 const TRIP_KEY = 'trip:default';
 
-const getDanishWeekday = (dateString: string): string => {
+const getEnglishWeekday = (dateString: string): string => {
   const date = new Date(dateString + 'T00:00:00');
   const dayOfWeek = date.getDay();
-  const danishWeekdays = ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'];
-  return danishWeekdays[dayOfWeek];
+  const englishWeekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  return englishWeekdays[dayOfWeek];
 };
 
 const getDefaultTripData = (): TripData => {
@@ -29,7 +29,7 @@ const getDefaultTripData = (): TripData => {
       const date = new Date(dateString + 'T00:00:00');
       const day = date.getDate();
       const month = danishMonths[date.getMonth()];
-      const weekday = getDanishWeekday(dateString);
+      const weekday = getEnglishWeekday(dateString);
       return {
         date: dateString,
         label: `${weekday}, ${day}. ${month}`

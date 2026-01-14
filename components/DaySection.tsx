@@ -71,7 +71,7 @@ export default function DaySection({
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              <span>Tilføj</span>
+              <span>Add</span>
             </>
           )}
         </button>
@@ -144,7 +144,7 @@ export default function DaySection({
               disabled={!title.trim()}
               className="flex-1 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2.5 px-4 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow"
             >
-              Tilføj
+              Add
             </button>
             <button
               type="button"

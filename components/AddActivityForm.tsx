@@ -107,7 +107,7 @@ export default function AddActivityForm({ day, onSubmit, onCancel }: AddActivity
           disabled={isSubmitting || !title.trim()}
           className="flex-1 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2.5 px-4 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow"
         >
-          {isSubmitting ? 'Tilføjer...' : 'Tilføj'}
+          {isSubmitting ? 'Adding...' : 'Add'}
         </button>
         <button
           type="button"
