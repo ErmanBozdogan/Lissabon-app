@@ -333,7 +333,7 @@ function HomePageInner() {
       )}
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* Header with Background Image */}
-        <div className="relative rounded-2xl shadow-lg mb-8 sticky top-4 z-10 overflow-hidden min-h-[280px]">
+        <div className="relative rounded-2xl shadow-lg mb-8 overflow-hidden min-h-[280px]">
           {/* Background Image */}
           <div className="absolute inset-0">
             {/* Try multiple image formats */}

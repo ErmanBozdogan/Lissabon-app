@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Load trip data from KV
-    const tripData = await kv.get<TripData>(TRIP_KEY);
+    let tripData = await kv.get<TripData>(TRIP_KEY);
     
     // If no trip data exists, initialize with default and save to KV
     if (!tripData) {
@@ -64,6 +64,27 @@ export async function GET(request: NextRequest) {
           'Cache-Control': 'no-store',
         },
       });
+    }
+
+    // Check if trip data has Danish weekdays and regenerate with English weekdays
+    const hasDanishWeekday = tripData.days.some(day => 
+      day.label.includes('Mandag') || 
+      day.label.includes('Tirsdag') || 
+      day.label.includes('Onsdag') ||
+      day.label.includes('Torsdag') ||
+      day.label.includes('Fredag') ||
+      day.label.includes('Lørdag') ||
+      day.label.includes('Søndag')
+    );
+
+    if (hasDanishWeekday) {
+      // Regenerate days with English weekdays, preserving activities
+      const defaultTrip = getDefaultTripData();
+      tripData.days = defaultTrip.days;
+      tripData.startDate = defaultTrip.startDate;
+      tripData.endDate = defaultTrip.endDate;
+      // Preserve activities and other data
+      await kv.set(TRIP_KEY, tripData);
     }
 
     return NextResponse.json(tripData, {
