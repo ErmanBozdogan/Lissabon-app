@@ -145,13 +145,17 @@ function HomePageInner() {
     }
 
     const token = localStorage.getItem('auth_token');
+    const userName = user.name || localStorage.getItem('user_name') || 'User';
     const response = await fetch('/api/activities', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify(activity),
+      body: JSON.stringify({
+        ...activity,
+        creatorName: userName,
+      }),
     });
 
     if (!response.ok) {

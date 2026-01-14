@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { title, day, description, location, category } = await request.json();
+    const { title, day, description, location, category, creatorName } = await request.json();
 
     if (!title || !day) {
       return new Response(JSON.stringify({ error: 'Title and day are required' }), {
@@ -108,6 +108,9 @@ export async function POST(request: NextRequest) {
       tripData = getDefaultTripData();
     }
 
+    // Use creatorName from request if provided, otherwise fall back to user.name
+    const activityCreatorName = creatorName || user.name || 'User';
+
     const newActivity: Activity = {
       id: `activity-${Date.now()}-${uuidv4()}`,
       title,
@@ -115,7 +118,7 @@ export async function POST(request: NextRequest) {
       location,
       day,
       creatorId: user.id,
-      creatorName: user.name,
+      creatorName: activityCreatorName,
       createdAt: new Date().toISOString(),
       votes: [],
       category,
