@@ -383,42 +383,33 @@ function HomePageInner() {
 
         {/* Airbnb Section */}
         <div className="mb-8">
-          <a
-            href="https://www.airbnb.dk/rooms/1354341134071107243?source_impression_id=p3_1768404535_P3636nb6hNtiEVJt"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block group"
-          >
-            <div className="bg-white dark:bg-gray-900/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50 mb-4">
-              <div className="relative h-48 overflow-hidden">
+          <div className="bg-white dark:bg-gray-900/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50 mb-4">
+            <a
+              href="https://www.airbnb.dk/rooms/1354341134071107243?source_impression_id=p3_1768404535_P3636nb6hNtiEVJt"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 group"
+            >
+              <div className="flex-shrink-0">
                 <img
-                  src="/images/airbnb-preview.jpg"
-                  alt="Airbnb accommodation preview"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  onError={(e) => {
-                    // Fallback if image doesn't exist yet
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.parentElement!.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-pink-500 to-red-600 flex items-center justify-center"><svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm0 22C6.5 22 2 17.5 2 12S6.5 2 12 2s10 4.5 10 10-4.5 10-10 10zm-1-15h2v6h-2zm0 8h2v2h-2z"/></svg></div>';
-                  }}
+                  src="https://images.unsplash.com/photo-1556912172-45b7ce8ba90e?w=200&h=200&fit=crop&q=80"
+                  alt="Lisbon Airbnb preview"
+                  className="w-16 h-16 rounded-xl object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="p-5">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-base text-gray-900 dark:text-gray-50 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
-                      Our Airbnb
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
-                      View accommodation details
-                    </p>
-                  </div>
-                  <svg className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors flex-shrink-0 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-base text-gray-900 dark:text-gray-50 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+                  Our Airbnb
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+                  View accommodation details
+                </p>
               </div>
-            </div>
-          </a>
+              <svg className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
 
           {/* Address */}
           <div className="bg-white dark:bg-gray-900/50 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800/50">
