@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { TripData, Activity, User } from '@/types';
 import DaySection from '@/components/DaySection';
+import InteractiveMap from '@/components/InteractiveMap';
 import useSWR from 'swr';
 import { clearAuth } from '@/lib/client-auth';
 
@@ -404,35 +405,6 @@ function HomePageInner() {
     return locations;
   };
 
-  // Generate Google Maps embed URL with colored markers
-  const getMapEmbedUrl = () => {
-    const locations = getAllInspirationLocations();
-    // Filter out locations with "Various" or "Multiple" as they're not specific
-    const validLocations = locations.filter(loc => 
-      loc.location && 
-      !loc.location.includes('Various') && 
-      !loc.location.includes('Multiple')
-    );
-    
-    // Build markers - format: color:color|label:label|location (location should be URL encoded)
-    const markers = validLocations
-      .map(loc => {
-        const location = `${loc.name}, ${loc.location}`;
-        // Encode the location part only
-        return `color:${loc.color}|label:${loc.label}|${encodeURIComponent(location)}`;
-      });
-    
-    // Build the URL - each marker is a separate &markers= parameter
-    const baseUrl = 'https://www.google.com/maps';
-    const params = new URLSearchParams();
-    params.set('q', 'Lisbon, Portugal');
-    markers.forEach(marker => {
-      params.append('markers', marker);
-    });
-    params.set('output', 'embed');
-    
-    return `${baseUrl}?${params.toString()}`;
-  };
 
   // Generate Google Maps URL with all locations and colored markers
   const getFullMapUrl = () => {
@@ -1033,17 +1005,14 @@ function HomePageInner() {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               View all suggested locations and our Airbnb on the map below. Click &quot;Open in Google Maps&quot; to see all pins and get directions.
             </p>
-            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 mb-4 bg-gray-100 dark:bg-gray-800" style={{ height: '500px' }}>
-              <iframe
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                loading="lazy"
-                allowFullScreen
-                referrerPolicy="no-referrer-when-downgrade"
-                src={getMapEmbedUrl()}
-                title="Lisbon Map with all locations"
-              />
+            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 mb-4">
+              <InteractiveMap locations={getAllInspirationLocations() as Array<{
+                name: string;
+                location: string;
+                category: 'airbnb' | 'sightseeing' | 'restaurant' | 'brunch' | 'breakfast';
+                color: 'red' | 'blue' | 'green' | 'orange' | 'purple';
+                label: string;
+              }>} />
             </div>
             <div className="mb-4 flex flex-wrap gap-4 text-xs">
               <div className="flex items-center gap-2">
