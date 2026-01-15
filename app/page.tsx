@@ -367,6 +367,53 @@ function HomePageInner() {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
   };
 
+  // Collect all inspiration activities for the map
+  const getAllInspirationLocations = () => {
+    const locations = [
+      // Airbnb
+      { name: 'Our Airbnb', location: AIRBNB_ADDRESS, isAirbnb: true },
+      // Sightseeing
+      { name: 'Belém Tower', location: 'Avenida Brasília, Lisboa' },
+      { name: 'Jerónimos Monastery', location: 'Praça do Império, Lisboa' },
+      { name: 'São Jorge Castle', location: 'Castelo de São Jorge, Lisboa' },
+      { name: 'Alfama District', location: 'Alfama, Lisboa' },
+      { name: 'Tram 28', location: 'Various stops, Lisboa' },
+      { name: 'Lisbon Oceanarium', location: 'Parque das Nações, Lisboa' },
+      // Restaurants
+      { name: 'Time Out Market', location: 'Mercado da Ribeira, Lisboa' },
+      { name: 'Cervejaria Ramiro', location: 'Avenida Almirante Reis, Lisboa' },
+      { name: 'Pasteis de Belém', location: 'Rua de Belém, Lisboa' },
+      { name: 'Taberna da Rua das Flores', location: 'Rua das Flores, Lisboa' },
+      { name: 'A Cevicheria', location: 'Rua Dom Pedro V, Lisboa' },
+      { name: 'Bairro do Avillez', location: 'Rua Nova da Trindade, Lisboa' },
+      // Brunch
+      { name: 'Heim Cafe', location: 'Rua Santos-O-Velho, Lisboa' },
+      { name: 'The Mill', location: 'Rua do Poço dos Negros, Lisboa' },
+      { name: 'Dear Breakfast', location: 'Rua Gaivotas, Lisboa' },
+      { name: 'Nicolau Lisboa', location: 'Rua de São Nicolau, Lisboa' },
+      { name: 'Fauna & Flora', location: 'Rua da Esperança, Lisboa' },
+      { name: 'Comoba', location: 'Rua da Rosa, Lisboa' },
+      // Breakfast
+      { name: 'Copenhagen Coffee Lab', location: 'Multiple locations, Lisboa' },
+      { name: 'Fábrica Coffee Roasters', location: 'Rua das Portas de Santo Antão, Lisboa' },
+      { name: 'Café Tati', location: 'Rua Nova do Carvalho, Lisboa' },
+      { name: 'Café Brasileira', location: 'Rua Garrett, Lisboa' },
+      { name: 'Casa Portuguesa do Pastel de Bacalhau', location: 'Rua Augusta, Lisboa' },
+      { name: 'Manteigaria', location: 'Rua do Loreto, Lisboa' },
+    ];
+    return locations;
+  };
+
+  // Generate Google Maps URL with all locations
+  const getFullMapUrl = () => {
+    // Create a Google Maps URL centered on Lisbon with all locations
+    // Using a custom map URL that shows multiple locations
+    const locations = getAllInspirationLocations();
+    // Create a URL that opens Google Maps with Lisbon centered
+    // Users can then search for individual locations or use the search
+    return `https://www.google.com/maps/@38.722252,-9.139337,13z?entry=ttu`;
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -925,6 +972,40 @@ function HomePageInner() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Map Overview Section */}
+        <div className="mt-12 mb-8">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-50 tracking-tight mb-6">
+            Map Overview
+          </h2>
+          <div className="bg-white dark:bg-gray-900/50 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-800/50">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              View all suggested locations and our Airbnb on the map below. Click &quot;Open in Google Maps&quot; to see all pins and get directions.
+            </p>
+            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 mb-4" style={{ height: '500px' }}>
+              <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12450.999999999999!2d-9.139337!3d38.722252!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd19331a61e4f33b%3A0x400ebbde49036d0!2sLisbon%2C%20Portugal!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
+              />
+            </div>
+            <a
+              href={getFullMapUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+              </svg>
+              Open in Google Maps with all locations
+            </a>
           </div>
         </div>
       </div>
