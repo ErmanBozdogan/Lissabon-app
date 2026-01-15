@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser as getAuthUser } from '@/lib/auth';
 import { kv } from '@vercel/kv';
-import { TripData, Activity } from '@/types';
+import { TripData, Activity, Reaction } from '@/types';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const runtime = 'nodejs';
 
 const TRIP_KEY = 'trip:default';
+
+// Default emojis for reactions
+const DEFAULT_EMOJIS = ['👍', '👎', '🔥', '🍷', '😂', '🤯'];
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +26,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { activityId, userName, type } = await request.json();
+    const { activityId, userName, type, emoji } = await request.json();
 
     if (!activityId || !userName) {
       return new Response(JSON.stringify({ error: 'Activity ID and user name are required' }), {
@@ -45,9 +48,6 @@ export async function POST(request: NextRequest) {
         },
       });
     }
-
-    // type should be 'like' or 'dislike'
-    const voteType = type === 'dislike' ? 'dislike' : 'like';
 
     // Read the current trip from KV
     let tripData = await kv.get<TripData>(TRIP_KEY);
@@ -73,13 +73,78 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Get the activity and ensure arrays exist
     const activity = { ...tripData.activities[activityIndex] };
+    
+    // Handle emoji-based reactions (new system)
+    if (emoji) {
+      const reactions = activity.reactions || [];
+      const reactionIndex = reactions.findIndex(r => r.emoji === emoji);
+      
+      let updatedReactions: Reaction[];
+      
+      if (reactionIndex >= 0) {
+        // Reaction exists - toggle user
+        const reaction = reactions[reactionIndex];
+        const userIndex = reaction.users.indexOf(userName);
+        
+        if (userIndex >= 0) {
+          // Remove user from reaction
+          const updatedUsers = reaction.users.filter(u => u !== userName);
+          if (updatedUsers.length === 0) {
+            // Remove reaction if no users left
+            updatedReactions = reactions.filter((_, i) => i !== reactionIndex);
+          } else {
+            // Update reaction with user removed
+            updatedReactions = [...reactions];
+            updatedReactions[reactionIndex] = { ...reaction, users: updatedUsers };
+          }
+        } else {
+          // Add user to reaction
+          updatedReactions = [...reactions];
+          updatedReactions[reactionIndex] = { ...reaction, users: [...reaction.users, userName] };
+        }
+      } else {
+        // Create new reaction
+        updatedReactions = [...reactions, { emoji, users: [userName] }];
+      }
+      
+      // Migrate legacy likes/dislikes to reactions on first emoji reaction
+      let updatedLikes = activity.likes || [];
+      let updatedDislikes = activity.dislikes || [];
+      
+      // If user had legacy like/dislike, remove them
+      updatedLikes = updatedLikes.filter(name => name !== userName);
+      updatedDislikes = updatedDislikes.filter(name => name !== userName);
+      
+      const updatedActivity: Activity = {
+        ...activity,
+        reactions: updatedReactions,
+        likes: updatedLikes,
+        dislikes: updatedDislikes,
+      };
+
+      const updatedActivities = [...tripData.activities];
+      updatedActivities[activityIndex] = updatedActivity;
+
+      await kv.set(TRIP_KEY, { ...tripData, activities: updatedActivities });
+
+      return new Response(JSON.stringify({ activity: updatedActivity }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
+    
+    // Legacy like/dislike handling (backward compatibility)
+    const voteType = type === 'dislike' ? 'dislike' : 'like';
     const currentLikes = activity.likes || [];
     const currentDislikes = activity.dislikes || [];
+    const reactions = activity.reactions || [];
 
     let updatedLikes: string[];
     let updatedDislikes: string[];
+    let updatedReactions: Reaction[] = reactions;
 
     if (voteType === 'like') {
       // Handle like: remove from dislikes if present, toggle in likes
@@ -91,6 +156,27 @@ export async function POST(request: NextRequest) {
         // Add to likes
         updatedLikes = [...currentLikes, userName];
       }
+      
+      // Also update reactions (migrate to new system)
+      const thumbsUpIndex = updatedReactions.findIndex(r => r.emoji === '👍');
+      if (thumbsUpIndex >= 0) {
+        const reaction = updatedReactions[thumbsUpIndex];
+        if (reaction.users.includes(userName)) {
+          // Remove user
+          const updatedUsers = reaction.users.filter(u => u !== userName);
+          if (updatedUsers.length === 0) {
+            updatedReactions = updatedReactions.filter((_, i) => i !== thumbsUpIndex);
+          } else {
+            updatedReactions[thumbsUpIndex] = { ...reaction, users: updatedUsers };
+          }
+        } else {
+          // Add user
+          updatedReactions[thumbsUpIndex] = { ...reaction, users: [...reaction.users, userName] };
+        }
+      } else if (updatedLikes.includes(userName)) {
+        // Create new 👍 reaction
+        updatedReactions = [...updatedReactions, { emoji: '👍', users: [userName] }];
+      }
     } else {
       // Handle dislike: remove from likes if present, toggle in dislikes
       updatedLikes = currentLikes.filter(name => name !== userName);
@@ -101,6 +187,27 @@ export async function POST(request: NextRequest) {
         // Add to dislikes
         updatedDislikes = [...currentDislikes, userName];
       }
+      
+      // Also update reactions (migrate to new system)
+      const thumbsDownIndex = updatedReactions.findIndex(r => r.emoji === '👎');
+      if (thumbsDownIndex >= 0) {
+        const reaction = updatedReactions[thumbsDownIndex];
+        if (reaction.users.includes(userName)) {
+          // Remove user
+          const updatedUsers = reaction.users.filter(u => u !== userName);
+          if (updatedUsers.length === 0) {
+            updatedReactions = updatedReactions.filter((_, i) => i !== thumbsDownIndex);
+          } else {
+            updatedReactions[thumbsDownIndex] = { ...reaction, users: updatedUsers };
+          }
+        } else {
+          // Add user
+          updatedReactions[thumbsDownIndex] = { ...reaction, users: [...reaction.users, userName] };
+        }
+      } else if (updatedDislikes.includes(userName)) {
+        // Create new 👎 reaction
+        updatedReactions = [...updatedReactions, { emoji: '👎', users: [userName] }];
+      }
     }
 
     // Create updated activity with new arrays
@@ -108,6 +215,7 @@ export async function POST(request: NextRequest) {
       ...activity,
       likes: updatedLikes,
       dislikes: updatedDislikes,
+      reactions: updatedReactions,
     };
 
     // Update ONLY this activity in the activities array
@@ -131,8 +239,8 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error toggling like:', error);
-    return new Response(JSON.stringify({ error: 'Failed to toggle like' }), {
+    console.error('Error toggling reaction:', error);
+    return new Response(JSON.stringify({ error: 'Failed to toggle reaction' }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',

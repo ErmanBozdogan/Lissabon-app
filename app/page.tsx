@@ -261,7 +261,7 @@ function HomePageInner() {
     setSelectedInspiration(null);
   };
 
-  const handleVote = async (activityId: string, type: 'like' | 'dislike'): Promise<void> => {
+  const handleVote = async (activityId: string, emoji?: string, type?: 'like' | 'dislike'): Promise<void> => {
     if (!user || !tripData) return;
 
     // ALWAYS get userName from localStorage first (source of truth)
@@ -280,14 +280,18 @@ function HomePageInner() {
 
     const token = localStorage.getItem('auth_token');
     
-    // Call the likes API to toggle like/dislike
+    // Call the likes API to toggle reaction (emoji or legacy like/dislike)
     const response = await fetch('/api/likes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ activityId, userName, type }),
+      body: JSON.stringify({ 
+        activityId, 
+        userName, 
+        ...(emoji ? { emoji } : { type: type || 'like' })
+      }),
     });
     
     if (response.ok) {
@@ -297,8 +301,89 @@ function HomePageInner() {
         await mutateActivities();
       }
     } else {
-      const errorData = await response.json().catch(() => ({ error: 'Failed to toggle vote' }));
-      console.error('[Vote] Failed to toggle vote:', errorData.error || 'Unknown error');
+      const errorData = await response.json().catch(() => ({ error: 'Failed to toggle reaction' }));
+      console.error('[Vote] Failed to toggle reaction:', errorData.error || 'Unknown error');
+    }
+  };
+
+  const handleCommentAdd = async (activityId: string, text: string): Promise<void> => {
+    if (!user) return;
+
+    const userName = localStorage.getItem('user_name') || user.name;
+    if (!userName || userName === 'User' || userName.trim() === '') {
+      alert('Error: User name is required. Please log in again.');
+      return;
+    }
+
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch('/api/comments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ activityId, userName, text }),
+    });
+
+    if (response.ok) {
+      await mutateActivities();
+    } else {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to add comment' }));
+      alert(`Failed to add comment: ${errorData.error || 'Unknown error'}`);
+    }
+  };
+
+  const handleCommentEdit = async (activityId: string, commentId: string, text: string): Promise<void> => {
+    if (!user) return;
+
+    const userName = localStorage.getItem('user_name') || user.name;
+    if (!userName || userName === 'User' || userName.trim() === '') {
+      alert('Error: User name is required. Please log in again.');
+      return;
+    }
+
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch('/api/comments', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ activityId, commentId, userName, text }),
+    });
+
+    if (response.ok) {
+      await mutateActivities();
+    } else {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to edit comment' }));
+      alert(`Failed to edit comment: ${errorData.error || 'Unknown error'}`);
+    }
+  };
+
+  const handleCommentDelete = async (activityId: string, commentId: string): Promise<void> => {
+    if (!user) return;
+
+    const userName = localStorage.getItem('user_name') || user.name;
+    if (!userName || userName === 'User' || userName.trim() === '') {
+      alert('Error: User name is required. Please log in again.');
+      return;
+    }
+
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch('/api/comments', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ activityId, commentId, userName }),
+    });
+
+    if (response.ok) {
+      await mutateActivities();
+    } else {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to delete comment' }));
+      alert(`Failed to delete comment: ${errorData.error || 'Unknown error'}`);
     }
   };
 
@@ -631,6 +716,9 @@ function HomePageInner() {
             onVote={handleVote}
             onEditActivity={handleEditActivity}
             onDeleteActivity={handleDeleteActivity}
+            onCommentAdd={handleCommentAdd}
+            onCommentEdit={handleCommentEdit}
+            onCommentDelete={handleCommentDelete}
           />
         ))}
 

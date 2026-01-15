@@ -14,6 +14,7 @@ export default function EditActivityForm({ activity, onSubmit, onCancel }: EditA
   const [description, setDescription] = useState(activity.description || '');
   const [location, setLocation] = useState(activity.location || '');
   const [category, setCategory] = useState<Activity['category']>(activity.category || 'other');
+  const [budget, setBudget] = useState<Activity['budget']>(activity.budget);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -21,6 +22,7 @@ export default function EditActivityForm({ activity, onSubmit, onCancel }: EditA
     setDescription(activity.description || '');
     setLocation(activity.location || '');
     setCategory(activity.category || 'other');
+    setBudget(activity.budget);
   }, [activity]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,6 +36,7 @@ export default function EditActivityForm({ activity, onSubmit, onCancel }: EditA
         description: description.trim() || undefined,
         location: location.trim() || undefined,
         category,
+        budget: budget || undefined,
       });
     } catch (error) {
       console.error('Error updating activity:', error);
@@ -90,7 +93,7 @@ export default function EditActivityForm({ activity, onSubmit, onCancel }: EditA
         />
       </div>
 
-      <div className="mb-5">
+      <div className="mb-4">
         <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">
           Lokation
         </label>
@@ -101,6 +104,22 @@ export default function EditActivityForm({ activity, onSubmit, onCancel }: EditA
           className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent transition-all"
           placeholder="Valgfri adresse, lokation eller website URL"
         />
+      </div>
+
+      <div className="mb-5">
+        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">
+          Budget
+        </label>
+        <select
+          value={budget || ''}
+          onChange={(e) => setBudget(e.target.value as Activity['budget'] || undefined)}
+          className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent transition-all"
+        >
+          <option value="">Ingen budget</option>
+          <option value="cheap">💸 Cheap</option>
+          <option value="medium">💸💸 Medium</option>
+          <option value="expensive">💸💸💸 Expensive</option>
+        </select>
       </div>
 
       <div className="flex gap-2.5">

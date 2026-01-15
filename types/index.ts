@@ -5,6 +5,19 @@ export interface User {
   joinedAt: string;
 }
 
+export interface Reaction {
+  emoji: string;
+  users: string[]; // Array of user names who reacted with this emoji
+}
+
+export interface Comment {
+  id: string;
+  activityId: string;
+  userName: string;
+  text: string;
+  createdAt: string;
+}
+
 export interface Activity {
   id: string;
   title: string;
@@ -14,8 +27,11 @@ export interface Activity {
   creatorId: string;
   creatorName: string;
   createdAt: string;
-  likes: string[]; // Array of user names who liked this activity
-  dislikes: string[]; // Array of user names who disliked this activity
+  likes: string[]; // Array of user names who liked this activity (legacy, kept for backward compatibility)
+  dislikes: string[]; // Array of user names who disliked this activity (legacy, kept for backward compatibility)
+  reactions?: Reaction[]; // New emoji-based reactions system
+  comments?: Comment[]; // Comments on this activity
+  budget?: 'cheap' | 'medium' | 'expensive'; // Budget indicator
   category?: 'restaurant' | 'brunch' | 'sightseeing' | 'bar' | 'cafe' | 'experience' | 'other';
 }
 
