@@ -18,16 +18,10 @@ interface ActivityCardProps {
 
 const DEFAULT_EMOJIS = ['👍', '👎', '🔥', '🍷', '😂', '🤯'];
 
-const budgetEmojis: Record<string, string> = {
-  cheap: '💸',
-  medium: '💸💸',
-  expensive: '💸💸💸',
-};
-
-const budgetColors: Record<string, string> = {
-  cheap: 'text-green-600 dark:text-green-400',
-  medium: 'text-yellow-600 dark:text-yellow-400',
-  expensive: 'text-red-600 dark:text-red-400',
+const budgetConfig: Record<string, { icons: string; label: string; color: string }> = {
+  cheap: { icons: '💸', label: 'Cheap', color: 'text-green-600 dark:text-green-400' },
+  medium: { icons: '💸💸', label: 'Medium', color: 'text-yellow-600 dark:text-yellow-400' },
+  expensive: { icons: '💸💸💸', label: 'Expensive', color: 'text-red-600 dark:text-red-400' },
 };
 
 export default function ActivityCard({ 
@@ -246,11 +240,6 @@ export default function ActivityCard({
             <h3 className="font-semibold text-base text-gray-900 dark:text-gray-50 leading-tight">
               {activity.title}
             </h3>
-            {activity.budget && (
-              <span className={`text-sm font-medium ${budgetColors[activity.budget]}`}>
-                {budgetEmojis[activity.budget]}
-              </span>
-            )}
           </div>
           {activity.description && (
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2.5 leading-relaxed">
@@ -258,6 +247,14 @@ export default function ActivityCard({
             </p>
           )}
           {renderLocation()}
+          {activity.budget && (
+            <div className="flex items-center gap-1.5 mb-2 mt-2">
+              <span className="text-base">{budgetConfig[activity.budget].icons}</span>
+              <span className={`text-xs font-medium ${budgetConfig[activity.budget].color}`}>
+                {budgetConfig[activity.budget].label}
+              </span>
+            </div>
+          )}
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
             af {activity.creatorName}
           </p>
