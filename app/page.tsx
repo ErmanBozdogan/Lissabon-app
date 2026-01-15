@@ -367,51 +367,80 @@ function HomePageInner() {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
   };
 
-  // Collect all inspiration activities for the map
+  // Collect all inspiration activities for the map with categories
   const getAllInspirationLocations = () => {
     const locations = [
-      // Airbnb
-      { name: 'Our Airbnb', location: AIRBNB_ADDRESS, isAirbnb: true },
-      // Sightseeing
-      { name: 'Belém Tower', location: 'Avenida Brasília, Lisboa' },
-      { name: 'Jerónimos Monastery', location: 'Praça do Império, Lisboa' },
-      { name: 'São Jorge Castle', location: 'Castelo de São Jorge, Lisboa' },
-      { name: 'Alfama District', location: 'Alfama, Lisboa' },
-      { name: 'Tram 28', location: 'Various stops, Lisboa' },
-      { name: 'Lisbon Oceanarium', location: 'Parque das Nações, Lisboa' },
-      // Restaurants
-      { name: 'Time Out Market', location: 'Mercado da Ribeira, Lisboa' },
-      { name: 'Cervejaria Ramiro', location: 'Avenida Almirante Reis, Lisboa' },
-      { name: 'Pasteis de Belém', location: 'Rua de Belém, Lisboa' },
-      { name: 'Taberna da Rua das Flores', location: 'Rua das Flores, Lisboa' },
-      { name: 'A Cevicheria', location: 'Rua Dom Pedro V, Lisboa' },
-      { name: 'Bairro do Avillez', location: 'Rua Nova da Trindade, Lisboa' },
-      // Brunch
-      { name: 'Heim Cafe', location: 'Rua Santos-O-Velho, Lisboa' },
-      { name: 'The Mill', location: 'Rua do Poço dos Negros, Lisboa' },
-      { name: 'Dear Breakfast', location: 'Rua Gaivotas, Lisboa' },
-      { name: 'Nicolau Lisboa', location: 'Rua de São Nicolau, Lisboa' },
-      { name: 'Fauna & Flora', location: 'Rua da Esperança, Lisboa' },
-      { name: 'Comoba', location: 'Rua da Rosa, Lisboa' },
-      // Breakfast
-      { name: 'Copenhagen Coffee Lab', location: 'Multiple locations, Lisboa' },
-      { name: 'Fábrica Coffee Roasters', location: 'Rua das Portas de Santo Antão, Lisboa' },
-      { name: 'Café Tati', location: 'Rua Nova do Carvalho, Lisboa' },
-      { name: 'Café Brasileira', location: 'Rua Garrett, Lisboa' },
-      { name: 'Casa Portuguesa do Pastel de Bacalhau', location: 'Rua Augusta, Lisboa' },
-      { name: 'Manteigaria', location: 'Rua do Loreto, Lisboa' },
+      // Airbnb - Red
+      { name: 'Our Airbnb', location: AIRBNB_ADDRESS, category: 'airbnb', color: 'red', label: 'A' },
+      // Sightseeing - Blue
+      { name: 'Belém Tower', location: 'Avenida Brasília, Lisboa', category: 'sightseeing', color: 'blue', label: 'S' },
+      { name: 'Jerónimos Monastery', location: 'Praça do Império, Lisboa', category: 'sightseeing', color: 'blue', label: 'S' },
+      { name: 'São Jorge Castle', location: 'Castelo de São Jorge, Lisboa', category: 'sightseeing', color: 'blue', label: 'S' },
+      { name: 'Alfama District', location: 'Alfama, Lisboa', category: 'sightseeing', color: 'blue', label: 'S' },
+      { name: 'Tram 28', location: 'Various stops, Lisboa', category: 'sightseeing', color: 'blue', label: 'S' },
+      { name: 'Lisbon Oceanarium', location: 'Parque das Nações, Lisboa', category: 'sightseeing', color: 'blue', label: 'S' },
+      // Restaurants - Green
+      { name: 'Time Out Market', location: 'Mercado da Ribeira, Lisboa', category: 'restaurant', color: 'green', label: 'R' },
+      { name: 'Cervejaria Ramiro', location: 'Avenida Almirante Reis, Lisboa', category: 'restaurant', color: 'green', label: 'R' },
+      { name: 'Pasteis de Belém', location: 'Rua de Belém, Lisboa', category: 'restaurant', color: 'green', label: 'R' },
+      { name: 'Taberna da Rua das Flores', location: 'Rua das Flores, Lisboa', category: 'restaurant', color: 'green', label: 'R' },
+      { name: 'A Cevicheria', location: 'Rua Dom Pedro V, Lisboa', category: 'restaurant', color: 'green', label: 'R' },
+      { name: 'Bairro do Avillez', location: 'Rua Nova da Trindade, Lisboa', category: 'restaurant', color: 'green', label: 'R' },
+      // Brunch - Orange
+      { name: 'Heim Cafe', location: 'Rua Santos-O-Velho, Lisboa', category: 'brunch', color: 'orange', label: 'B' },
+      { name: 'The Mill', location: 'Rua do Poço dos Negros, Lisboa', category: 'brunch', color: 'orange', label: 'B' },
+      { name: 'Dear Breakfast', location: 'Rua Gaivotas, Lisboa', category: 'brunch', color: 'orange', label: 'B' },
+      { name: 'Nicolau Lisboa', location: 'Rua de São Nicolau, Lisboa', category: 'brunch', color: 'orange', label: 'B' },
+      { name: 'Fauna & Flora', location: 'Rua da Esperança, Lisboa', category: 'brunch', color: 'orange', label: 'B' },
+      { name: 'Comoba', location: 'Rua da Rosa, Lisboa', category: 'brunch', color: 'orange', label: 'B' },
+      // Breakfast - Purple
+      { name: 'Copenhagen Coffee Lab', location: 'Multiple locations, Lisboa', category: 'breakfast', color: 'purple', label: 'C' },
+      { name: 'Fábrica Coffee Roasters', location: 'Rua das Portas de Santo Antão, Lisboa', category: 'breakfast', color: 'purple', label: 'C' },
+      { name: 'Café Tati', location: 'Rua Nova do Carvalho, Lisboa', category: 'breakfast', color: 'purple', label: 'C' },
+      { name: 'Café Brasileira', location: 'Rua Garrett, Lisboa', category: 'breakfast', color: 'purple', label: 'C' },
+      { name: 'Casa Portuguesa do Pastel de Bacalhau', location: 'Rua Augusta, Lisboa', category: 'breakfast', color: 'purple', label: 'C' },
+      { name: 'Manteigaria', location: 'Rua do Loreto, Lisboa', category: 'breakfast', color: 'purple', label: 'C' },
     ];
     return locations;
   };
 
-  // Generate Google Maps URL with all locations
-  const getFullMapUrl = () => {
-    // Create a Google Maps URL centered on Lisbon with all locations
-    // Using a custom map URL that shows multiple locations
+  // Generate Google Maps embed URL with colored markers
+  const getMapEmbedUrl = () => {
     const locations = getAllInspirationLocations();
-    // Create a URL that opens Google Maps with Lisbon centered
-    // Users can then search for individual locations or use the search
-    return `https://www.google.com/maps/@38.722252,-9.139337,13z?entry=ttu`;
+    // Build markers parameter for Google Maps URL
+    // Filter out locations with "Various" or "Multiple" as they're not specific
+    const validLocations = locations.filter(loc => 
+      loc.location && 
+      !loc.location.includes('Various') && 
+      !loc.location.includes('Multiple')
+    );
+    
+    // Build markers string - Google Maps URL format
+    const markers = validLocations
+      .map(loc => {
+        const query = encodeURIComponent(`${loc.name}, ${loc.location}`);
+        return `color:${loc.color}|label:${loc.label}|${query}`;
+      })
+      .join('&markers=');
+    
+    // Use Google Maps URL with markers (works without API key)
+    const center = encodeURIComponent('Lisbon, Portugal');
+    return `https://www.google.com/maps?q=${center}&markers=${markers}&output=embed`;
+  };
+
+  // Generate Google Maps URL with all locations and colored markers
+  const getFullMapUrl = () => {
+    const locations = getAllInspirationLocations();
+    // Build markers for the full Google Maps URL
+    const markers = locations
+      .filter(loc => loc.location && !loc.location.includes('Various') && !loc.location.includes('Multiple'))
+      .map(loc => {
+        const query = encodeURIComponent(`${loc.name}, ${loc.location}`);
+        return `color:${loc.color}|label:${loc.label}|${query}`;
+      })
+      .join('&markers=');
+    
+    return `https://www.google.com/maps?q=Lisbon,+Portugal&markers=${markers}`;
   };
 
   if (isLoading) {
@@ -984,7 +1013,7 @@ function HomePageInner() {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               View all suggested locations and our Airbnb on the map below. Click &quot;Open in Google Maps&quot; to see all pins and get directions.
             </p>
-            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 mb-4" style={{ height: '500px' }}>
+            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 mb-4 bg-gray-100 dark:bg-gray-800" style={{ height: '500px' }}>
               <iframe
                 width="100%"
                 height="100%"
@@ -992,8 +1021,31 @@ function HomePageInner() {
                 loading="lazy"
                 allowFullScreen
                 referrerPolicy="no-referrer-when-downgrade"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12450.999999999999!2d-9.139337!3d38.722252!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd19331a61e4f33b%3A0x400ebbde49036d0!2sLisbon%2C%20Portugal!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
+                src={getMapEmbedUrl()}
+                title="Lisbon Map with all locations"
               />
+            </div>
+            <div className="mb-4 flex flex-wrap gap-4 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-red-500"></div>
+                <span className="text-gray-600 dark:text-gray-400">Airbnb</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                <span className="text-gray-600 dark:text-gray-400">Sightseeing</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                <span className="text-gray-600 dark:text-gray-400">Restaurants</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-orange-500"></div>
+                <span className="text-gray-600 dark:text-gray-400">Brunch</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-purple-500"></div>
+                <span className="text-gray-600 dark:text-gray-400">Breakfast</span>
+              </div>
             </div>
             <a
               href={getFullMapUrl()}
