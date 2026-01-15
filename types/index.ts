@@ -32,6 +32,7 @@ export interface Activity {
   reactions?: Reaction[]; // New emoji-based reactions system
   comments?: Comment[]; // Comments on this activity
   budget?: 'cheap' | 'medium' | 'expensive'; // Budget indicator
+  status?: 'confirmed' | 'tentative'; // Activity status - default is tentative
   category?: 'restaurant' | 'brunch' | 'sightseeing' | 'bar' | 'cafe' | 'experience' | 'other';
 }
 

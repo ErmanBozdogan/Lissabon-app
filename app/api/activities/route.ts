@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { title, day, description, location, category, creatorName } = await request.json();
+    const { title, day, description, location, category, creatorName, budget, status } = await request.json();
 
     if (!title || !day) {
       return new Response(JSON.stringify({ error: 'Title and day are required' }), {
@@ -139,6 +139,8 @@ export async function POST(request: NextRequest) {
       likes: [],
       dislikes: [],
       category,
+      budget,
+      status: status || 'tentative', // Default to tentative if not provided
     };
 
     // Add new activity to trip

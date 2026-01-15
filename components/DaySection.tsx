@@ -37,6 +37,7 @@ export default function DaySection({
   const [location, setLocation] = useState('');
   const [category, setCategory] = useState<Activity['category']>('other');
   const [budget, setBudget] = useState<Activity['budget']>();
+  const [status, setStatus] = useState<Activity['status']>('tentative');
   
   // Update collapsed state when activities change
   useEffect(() => {
@@ -56,9 +57,11 @@ export default function DaySection({
       day: day.date,
       category,
       budget: budget || undefined,
+      status: status || 'tentative',
     });
     
     setBudget(undefined);
+    setStatus('tentative');
     
     // Expand if collapsed after adding activity
     if (isCollapsed) {
@@ -175,7 +178,7 @@ export default function DaySection({
             />
           </div>
 
-          <div className="mb-5">
+          <div className="mb-4">
             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">
               Budget
             </label>
@@ -188,6 +191,20 @@ export default function DaySection({
               <option value="cheap">💸 Cheap</option>
               <option value="medium">💸💸 Medium</option>
               <option value="expensive">💸💸💸 Expensive</option>
+            </select>
+          </div>
+
+          <div className="mb-5">
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wide">
+              Status
+            </label>
+            <select
+              value={status || 'tentative'}
+              onChange={(e) => setStatus(e.target.value as Activity['status'] || 'tentative')}
+              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent transition-all"
+            >
+              <option value="tentative">🟡 Tentative</option>
+              <option value="confirmed">🟢 Confirmed</option>
             </select>
           </div>
 

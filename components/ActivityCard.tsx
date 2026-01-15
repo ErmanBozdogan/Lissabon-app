@@ -255,6 +255,14 @@ export default function ActivityCard({
               </span>
             </div>
           )}
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="text-base">
+              {(activity.status || 'tentative') === 'confirmed' ? '🟢' : '🟡'}
+            </span>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400 capitalize">
+              {(activity.status || 'tentative') === 'confirmed' ? 'Confirmed' : 'Tentative'}
+            </span>
+          </div>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
             af {activity.creatorName}
           </p>
