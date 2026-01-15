@@ -352,6 +352,21 @@ function HomePageInner() {
     router.push('/join');
   };
 
+  // Airbnb address constant
+  const AIRBNB_ADDRESS = 'Calçada de Salvador Correia de Sá 4, Lisbon, Lisbon 1200-066';
+
+  // Function to get Google Maps directions URL from Airbnb to activity
+  const getDirectionsUrl = (destination: string) => {
+    const origin = encodeURIComponent(AIRBNB_ADDRESS);
+    const dest = encodeURIComponent(destination);
+    return `https://www.google.com/maps/dir/${origin}/${dest}`;
+  };
+
+  // Function to get Google Maps search URL for activity
+  const getMapsUrl = (query: string) => {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -650,14 +665,40 @@ function HomePageInner() {
                     {item.description}
                   </p>
                   {item.location && (
-                    <a
-                      href={item.mapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 mb-3"
-                    >
-                      📍 {item.location}
-                    </a>
+                    <div className="mb-3">
+                      <a
+                        href={item.mapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 mb-2 block"
+                      >
+                        📍 {item.location}
+                      </a>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <a
+                          href={getMapsUrl(`${item.name}, ${item.location}`)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                          </svg>
+                          View on Maps
+                        </a>
+                        <a
+                          href={getDirectionsUrl(`${item.name}, ${item.location}`)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                          </svg>
+                          Directions from Airbnb
+                        </a>
+                      </div>
+                    </div>
                   )}
                   <button
                     onClick={() => handleAddInspiration({ ...item, category: 'sightseeing' })}
@@ -696,14 +737,40 @@ function HomePageInner() {
                     {item.description}
                   </p>
                   {item.location && (
-                    <a
-                      href={item.mapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 mb-3"
-                    >
-                      📍 {item.location}
-                    </a>
+                    <div className="mb-3">
+                      <a
+                        href={item.mapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 mb-2 block"
+                      >
+                        📍 {item.location}
+                      </a>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <a
+                          href={getMapsUrl(`${item.name}, ${item.location}`)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                          </svg>
+                          View on Maps
+                        </a>
+                        <a
+                          href={getDirectionsUrl(`${item.name}, ${item.location}`)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                          </svg>
+                          Directions from Airbnb
+                        </a>
+                      </div>
+                    </div>
                   )}
                   <button
                     onClick={() => handleAddInspiration({ ...item, category: 'restaurant' })}
@@ -742,14 +809,40 @@ function HomePageInner() {
                     {item.description}
                   </p>
                   {item.location && (
-                    <a
-                      href={item.mapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 mb-3"
-                    >
-                      📍 {item.location}
-                    </a>
+                    <div className="mb-3">
+                      <a
+                        href={item.mapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 mb-2 block"
+                      >
+                        📍 {item.location}
+                      </a>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <a
+                          href={getMapsUrl(`${item.name}, ${item.location}`)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                          </svg>
+                          View on Maps
+                        </a>
+                        <a
+                          href={getDirectionsUrl(`${item.name}, ${item.location}`)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                          </svg>
+                          Directions from Airbnb
+                        </a>
+                      </div>
+                    </div>
                   )}
                   <button
                     onClick={() => handleAddInspiration({ ...item, category: 'brunch' })}
@@ -788,14 +881,40 @@ function HomePageInner() {
                     {item.description}
                   </p>
                   {item.location && (
-                    <a
-                      href={item.mapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 mb-3"
-                    >
-                      📍 {item.location}
-                    </a>
+                    <div className="mb-3">
+                      <a
+                        href={item.mapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 mb-2 block"
+                      >
+                        📍 {item.location}
+                      </a>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <a
+                          href={getMapsUrl(`${item.name}, ${item.location}`)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                          </svg>
+                          View on Maps
+                        </a>
+                        <a
+                          href={getDirectionsUrl(`${item.name}, ${item.location}`)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                          </svg>
+                          Directions from Airbnb
+                        </a>
+                      </div>
+                    </div>
                   )}
                   <button
                     onClick={() => handleAddInspiration({ ...item, category: 'cafe' })}
