@@ -407,7 +407,6 @@ function HomePageInner() {
   // Generate Google Maps embed URL with colored markers
   const getMapEmbedUrl = () => {
     const locations = getAllInspirationLocations();
-    // Build markers parameter for Google Maps URL
     // Filter out locations with "Various" or "Multiple" as they're not specific
     const validLocations = locations.filter(loc => 
       loc.location && 
@@ -415,32 +414,53 @@ function HomePageInner() {
       !loc.location.includes('Multiple')
     );
     
-    // Build markers string - Google Maps URL format
+    // Build markers - format: color:color|label:label|location (location should be URL encoded)
     const markers = validLocations
       .map(loc => {
-        const query = encodeURIComponent(`${loc.name}, ${loc.location}`);
-        return `color:${loc.color}|label:${loc.label}|${query}`;
-      })
-      .join('&markers=');
+        const location = `${loc.name}, ${loc.location}`;
+        // Encode the location part only
+        return `color:${loc.color}|label:${loc.label}|${encodeURIComponent(location)}`;
+      });
     
-    // Use Google Maps URL with markers (works without API key)
-    const center = encodeURIComponent('Lisbon, Portugal');
-    return `https://www.google.com/maps?q=${center}&markers=${markers}&output=embed`;
+    // Build the URL - each marker is a separate &markers= parameter
+    const baseUrl = 'https://www.google.com/maps';
+    const params = new URLSearchParams();
+    params.set('q', 'Lisbon, Portugal');
+    markers.forEach(marker => {
+      params.append('markers', marker);
+    });
+    params.set('output', 'embed');
+    
+    return `${baseUrl}?${params.toString()}`;
   };
 
   // Generate Google Maps URL with all locations and colored markers
   const getFullMapUrl = () => {
     const locations = getAllInspirationLocations();
-    // Build markers for the full Google Maps URL
-    const markers = locations
-      .filter(loc => loc.location && !loc.location.includes('Various') && !loc.location.includes('Multiple'))
-      .map(loc => {
-        const query = encodeURIComponent(`${loc.name}, ${loc.location}`);
-        return `color:${loc.color}|label:${loc.label}|${query}`;
-      })
-      .join('&markers=');
+    // Filter out locations with "Various" or "Multiple" as they're not specific
+    const validLocations = locations.filter(loc => 
+      loc.location && 
+      !loc.location.includes('Various') && 
+      !loc.location.includes('Multiple')
+    );
     
-    return `https://www.google.com/maps?q=Lisbon,+Portugal&markers=${markers}`;
+    // Build markers - format: color:color|label:label|location (location should be URL encoded)
+    const markers = validLocations
+      .map(loc => {
+        const location = `${loc.name}, ${loc.location}`;
+        // Encode the location part only
+        return `color:${loc.color}|label:${loc.label}|${encodeURIComponent(location)}`;
+      });
+    
+    // Build the URL - each marker is a separate &markers= parameter
+    const baseUrl = 'https://www.google.com/maps';
+    const params = new URLSearchParams();
+    params.set('q', 'Lisbon, Portugal');
+    markers.forEach(marker => {
+      params.append('markers', marker);
+    });
+    
+    return `${baseUrl}?${params.toString()}`;
   };
 
   if (isLoading) {
