@@ -367,7 +367,7 @@ export default function ActivityCard({
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium transition-all duration-200 bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <span className="text-base">😀</span>
-            <span className="text-base">➕</span>
+            <span>Add emoji</span>
           </button>
           {showEmojiPicker && (
             <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-2 z-50">
