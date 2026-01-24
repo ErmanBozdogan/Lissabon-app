@@ -728,6 +728,102 @@ function HomePageInner() {
             Inspiration
           </h2>
           
+          {/* Nightlife */}
+          <div className="mb-8">
+            <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+              <span className="text-2xl">🍻</span>
+              Nightlife
+            </h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              {[
+                { name: 'Pensão Amor', description: 'Sophisticated bar in a former brothel with live music and cocktails', location: 'Rua do Alecrim, Lisboa', mapsUrl: 'https://maps.google.com/?q=Pensao+Amor+Lisbon', instagramUrl: 'https://www.instagram.com/pensaoamor/', imageUrl: 'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&h=300&fit=crop' },
+                { name: 'Park Bar', description: 'Rooftop bar with stunning views, perfect for sunset drinks', location: 'Calçada do Combro, Lisboa', mapsUrl: 'https://maps.google.com/?q=Park+Bar+Lisbon', instagramUrl: 'https://www.instagram.com/parklisboa/', imageUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=300&fit=crop' },
+                { name: 'Red Frog Speakeasy', description: 'Hidden cocktail bar with expert mixologists and intimate atmosphere', location: 'Rua do Conde, Lisboa', mapsUrl: 'https://maps.google.com/?q=Red+Frog+Speakeasy+Lisbon', instagramUrl: 'https://www.instagram.com/redfrogspeakeasy/', imageUrl: 'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&h=300&fit=crop' },
+                { name: 'Lux Fragil', description: 'Iconic nightclub with electronic music and sophisticated crowd', location: 'Avenida Infante D. Henrique, Lisboa', mapsUrl: 'https://maps.google.com/?q=Lux+Fragil+Lisbon', instagramUrl: 'https://www.instagram.com/luxfragil/', imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=300&fit=crop' },
+                { name: 'Casa Independente', description: 'Cultural center and bar with live music and art exhibitions', location: 'Largo do Intendente, Lisboa', mapsUrl: 'https://maps.google.com/?q=Casa+Independente+Lisbon', instagramUrl: 'https://www.instagram.com/casaindependente/', imageUrl: 'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&h=300&fit=crop' },
+                { name: 'Cinco Lounge', description: 'Elegant cocktail bar with creative drinks and relaxed vibe', location: 'Rua Ruben A. Leitão, Lisboa', mapsUrl: 'https://maps.google.com/?q=Cinco+Lounge+Lisbon', instagramUrl: 'https://www.instagram.com/cincolounge/', imageUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=300&fit=crop' },
+              ].map((item, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white dark:bg-gray-900/50 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50 overflow-hidden"
+                >
+                  {item.imageUrl && (
+                    <div className="w-full h-48 overflow-hidden">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <h4 className="font-semibold text-base text-gray-900 dark:text-gray-50 mb-1.5">
+                      {item.name}
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
+                      {item.description}
+                    </p>
+                    {item.location && (
+                      <div className="mb-3">
+                        <a
+                          href={item.mapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 mb-2 block"
+                        >
+                          📍 {item.location}
+                        </a>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <a
+                            href={getMapsUrl(`${item.name}, ${item.location}`)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                          >
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                            </svg>
+                            View on Maps
+                          </a>
+                          <a
+                            href={getDirectionsUrl(`${item.name}, ${item.location}`)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                          >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                            </svg>
+                            Directions from Airbnb
+                          </a>
+                          {item.instagramUrl && (
+                            <a
+                              href={item.instagramUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors inline-flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                            >
+                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                              </svg>
+                              View on Instagram
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    <button
+                      onClick={() => handleAddInspiration({ ...item, category: 'bar' })}
+                      className="w-full mt-3 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
+                    >
+                      Add to activity
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
           {/* Sightseeing */}
           <div className="mb-8">
             <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
@@ -736,23 +832,33 @@ function HomePageInner() {
             </h3>
             <div className="grid gap-4 md:grid-cols-2">
               {[
-                { name: 'Belém Tower', description: 'Historic tower and UNESCO World Heritage site', location: 'Avenida Brasília, Lisboa', mapsUrl: 'https://maps.google.com/?q=Belem+Tower+Lisbon', instagramUrl: 'https://www.instagram.com/explore/locations/213385558/torre-de-belem/' },
-                { name: 'Jerónimos Monastery', description: 'Manueline architecture masterpiece', location: 'Praça do Império, Lisboa', mapsUrl: 'https://maps.google.com/?q=Jeronimos+Monastery+Lisbon', instagramUrl: 'https://www.instagram.com/explore/locations/213385559/mosteiro-dos-jeronimos/' },
-                { name: 'São Jorge Castle', description: 'Medieval castle with panoramic city views', location: 'Castelo de São Jorge, Lisboa', mapsUrl: 'https://maps.google.com/?q=Sao+Jorge+Castle+Lisbon', instagramUrl: 'https://www.instagram.com/explore/locations/213385560/castelo-de-sao-jorge/' },
-                { name: 'Alfama District', description: 'Historic neighborhood with narrow streets', location: 'Alfama, Lisboa', mapsUrl: 'https://maps.google.com/?q=Alfama+Lisbon', instagramUrl: 'https://www.instagram.com/explore/tags/alfamalisboa/' },
-                { name: 'Tram 28', description: 'Iconic tram route through historic neighborhoods', location: 'Various stops, Lisboa', mapsUrl: 'https://maps.google.com/?q=Tram+28+Lisbon', instagramUrl: 'https://www.instagram.com/explore/tags/tram28lisbon/' },
-                { name: 'Lisbon Oceanarium', description: 'One of the largest aquariums in Europe', location: 'Parque das Nações, Lisboa', mapsUrl: 'https://maps.google.com/?q=Lisbon+Oceanarium', instagramUrl: 'https://www.instagram.com/oceanario_lisboa/' },
+                { name: 'Belém Tower', description: 'Historic tower and UNESCO World Heritage site', location: 'Avenida Brasília, Lisboa', mapsUrl: 'https://maps.google.com/?q=Belem+Tower+Lisbon', instagramUrl: 'https://www.instagram.com/explore/locations/213385558/torre-de-belem/', imageUrl: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=400&h=300&fit=crop' },
+                { name: 'Jerónimos Monastery', description: 'Manueline architecture masterpiece', location: 'Praça do Império, Lisboa', mapsUrl: 'https://maps.google.com/?q=Jeronimos+Monastery+Lisbon', instagramUrl: 'https://www.instagram.com/explore/locations/213385559/mosteiro-dos-jeronimos/', imageUrl: 'https://images.unsplash.com/photo-1555993536-7d5c0e0b0b0b?w=400&h=300&fit=crop' },
+                { name: 'São Jorge Castle', description: 'Medieval castle with panoramic city views', location: 'Castelo de São Jorge, Lisboa', mapsUrl: 'https://maps.google.com/?q=Sao+Jorge+Castle+Lisbon', instagramUrl: 'https://www.instagram.com/explore/locations/213385560/castelo-de-sao-jorge/', imageUrl: 'https://images.unsplash.com/photo-1555993536-7d5c0e0b0b0b?w=400&h=300&fit=crop' },
+                { name: 'Alfama District', description: 'Historic neighborhood with narrow streets', location: 'Alfama, Lisboa', mapsUrl: 'https://maps.google.com/?q=Alfama+Lisbon', instagramUrl: 'https://www.instagram.com/explore/tags/alfamalisboa/', imageUrl: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=400&h=300&fit=crop' },
+                { name: 'Tram 28', description: 'Iconic tram route through historic neighborhoods', location: 'Various stops, Lisboa', mapsUrl: 'https://maps.google.com/?q=Tram+28+Lisbon', instagramUrl: 'https://www.instagram.com/explore/tags/tram28lisbon/', imageUrl: 'https://images.unsplash.com/photo-1555993536-7d5c0e0b0b0b?w=400&h=300&fit=crop' },
+                { name: 'Lisbon Oceanarium', description: 'One of the largest aquariums in Europe', location: 'Parque das Nações, Lisboa', mapsUrl: 'https://maps.google.com/?q=Lisbon+Oceanarium', instagramUrl: 'https://www.instagram.com/oceanario_lisboa/', imageUrl: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=400&h=300&fit=crop' },
               ].map((item, idx) => (
                 <div
                   key={idx}
-                  className="bg-white dark:bg-gray-900/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50"
+                  className="bg-white dark:bg-gray-900/50 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50 overflow-hidden"
                 >
-                  <h4 className="font-semibold text-base text-gray-900 dark:text-gray-50 mb-1.5">
-                    {item.name}
-                  </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
-                    {item.description}
-                  </p>
+                  {item.imageUrl && (
+                    <div className="w-full h-48 overflow-hidden">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <h4 className="font-semibold text-base text-gray-900 dark:text-gray-50 mb-1.5">
+                      {item.name}
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
+                      {item.description}
+                    </p>
                   {item.location && (
                     <div className="mb-3">
                       <a
@@ -802,12 +908,13 @@ function HomePageInner() {
                       </div>
                     </div>
                   )}
-                  <button
-                    onClick={() => handleAddInspiration({ ...item, category: 'sightseeing' })}
-                    className="w-full mt-3 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
-                  >
-                    Add to activity
-                  </button>
+                    <button
+                      onClick={() => handleAddInspiration({ ...item, category: 'sightseeing' })}
+                      className="w-full mt-3 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
+                    >
+                      Add to activity
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -821,23 +928,33 @@ function HomePageInner() {
             </h3>
             <div className="grid gap-4 md:grid-cols-2">
               {[
-                { name: 'Time Out Market', description: 'Food hall with local and international cuisine', location: 'Mercado da Ribeira, Lisboa', mapsUrl: 'https://maps.google.com/?q=Time+Out+Market+Lisbon', instagramUrl: 'https://www.instagram.com/timeoutmarketlisboa/' },
-                { name: 'Cervejaria Ramiro', description: 'Famous seafood restaurant', location: 'Avenida Almirante Reis, Lisboa', mapsUrl: 'https://maps.google.com/?q=Cervejaria+Ramiro+Lisbon', instagramUrl: 'https://www.instagram.com/cervejariaramiro/' },
-                { name: 'Pasteis de Belém', description: 'Original pastel de nata bakery', location: 'Rua de Belém, Lisboa', mapsUrl: 'https://maps.google.com/?q=Pasteis+de+Belem+Lisbon', instagramUrl: 'https://www.instagram.com/pasteisdebelem/' },
-                { name: 'Taberna da Rua das Flores', description: 'Traditional Portuguese tapas', location: 'Rua das Flores, Lisboa', mapsUrl: 'https://maps.google.com/?q=Taberna+da+Rua+das+Flores+Lisbon', instagramUrl: 'https://www.instagram.com/explore/tags/tabernadaruaflores/' },
-                { name: 'A Cevicheria', description: 'Modern Peruvian-inspired seafood', location: 'Rua Dom Pedro V, Lisboa', mapsUrl: 'https://maps.google.com/?q=A+Cevicheria+Lisbon', instagramUrl: 'https://www.instagram.com/acevicheria/' },
-                { name: 'Bairro do Avillez', description: 'Celebrity chef José Avillez restaurant', location: 'Rua Nova da Trindade, Lisboa', mapsUrl: 'https://maps.google.com/?q=Bairro+do+Avillez+Lisbon', instagramUrl: 'https://www.instagram.com/bairrodoavillez/' },
+                { name: 'Time Out Market', description: 'Food hall with local and international cuisine', location: 'Mercado da Ribeira, Lisboa', mapsUrl: 'https://maps.google.com/?q=Time+Out+Market+Lisbon', instagramUrl: 'https://www.instagram.com/timeoutmarketlisboa/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'Cervejaria Ramiro', description: 'Famous seafood restaurant', location: 'Avenida Almirante Reis, Lisboa', mapsUrl: 'https://maps.google.com/?q=Cervejaria+Ramiro+Lisbon', instagramUrl: 'https://www.instagram.com/cervejariaramiro/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'Pasteis de Belém', description: 'Original pastel de nata bakery', location: 'Rua de Belém, Lisboa', mapsUrl: 'https://maps.google.com/?q=Pasteis+de+Belem+Lisbon', instagramUrl: 'https://www.instagram.com/pasteisdebelem/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'Taberna da Rua das Flores', description: 'Traditional Portuguese tapas', location: 'Rua das Flores, Lisboa', mapsUrl: 'https://maps.google.com/?q=Taberna+da+Rua+das+Flores+Lisbon', instagramUrl: 'https://www.instagram.com/explore/tags/tabernadaruaflores/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'A Cevicheria', description: 'Modern Peruvian-inspired seafood', location: 'Rua Dom Pedro V, Lisboa', mapsUrl: 'https://maps.google.com/?q=A+Cevicheria+Lisbon', instagramUrl: 'https://www.instagram.com/acevicheria/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'Bairro do Avillez', description: 'Celebrity chef José Avillez restaurant', location: 'Rua Nova da Trindade, Lisboa', mapsUrl: 'https://maps.google.com/?q=Bairro+do+Avillez+Lisbon', instagramUrl: 'https://www.instagram.com/bairrodoavillez/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
               ].map((item, idx) => (
                 <div
                   key={idx}
-                  className="bg-white dark:bg-gray-900/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50"
+                  className="bg-white dark:bg-gray-900/50 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50 overflow-hidden"
                 >
-                  <h4 className="font-semibold text-base text-gray-900 dark:text-gray-50 mb-1.5">
-                    {item.name}
-                  </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
-                    {item.description}
-                  </p>
+                  {item.imageUrl && (
+                    <div className="w-full h-48 overflow-hidden">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <h4 className="font-semibold text-base text-gray-900 dark:text-gray-50 mb-1.5">
+                      {item.name}
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
+                      {item.description}
+                    </p>
                   {item.location && (
                     <div className="mb-3">
                       <a
@@ -887,12 +1004,13 @@ function HomePageInner() {
                       </div>
                     </div>
                   )}
-                  <button
-                    onClick={() => handleAddInspiration({ ...item, category: 'restaurant' })}
-                    className="w-full mt-3 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
-                  >
-                    Add to activity
-                  </button>
+                    <button
+                      onClick={() => handleAddInspiration({ ...item, category: 'restaurant' })}
+                      className="w-full mt-3 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
+                    >
+                      Add to activity
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -906,23 +1024,33 @@ function HomePageInner() {
             </h3>
             <div className="grid gap-4 md:grid-cols-2">
               {[
-                { name: 'Heim Cafe', description: 'Popular brunch spot with great coffee and avocado toast', location: 'Rua Santos-O-Velho, Lisboa', mapsUrl: 'https://maps.google.com/?q=Heim+Cafe+Lisbon', instagramUrl: 'https://www.instagram.com/heimcafe/' },
-                { name: 'The Mill', description: 'Australian-style brunch with excellent pancakes', location: 'Rua do Poço dos Negros, Lisboa', mapsUrl: 'https://maps.google.com/?q=The+Mill+Lisbon', instagramUrl: 'https://www.instagram.com/themilllisbon/' },
-                { name: 'Dear Breakfast', description: 'Trendy brunch cafe with Instagram-worthy dishes', location: 'Rua Gaivotas, Lisboa', mapsUrl: 'https://maps.google.com/?q=Dear+Breakfast+Lisbon', instagramUrl: 'https://www.instagram.com/dearbreakfast/' },
-                { name: 'Nicolau Lisboa', description: 'Cozy brunch spot with Portuguese and international options', location: 'Rua de São Nicolau, Lisboa', mapsUrl: 'https://maps.google.com/?q=Nicolau+Lisboa', instagramUrl: 'https://www.instagram.com/nicolaulisboa/' },
-                { name: 'Fauna & Flora', description: 'Plant-based brunch with healthy options', location: 'Rua da Esperança, Lisboa', mapsUrl: 'https://maps.google.com/?q=Fauna+Flora+Lisbon', instagramUrl: 'https://www.instagram.com/faunafloracafe/' },
-                { name: 'Comoba', description: 'Modern brunch with fresh ingredients and great coffee', location: 'Rua da Rosa, Lisboa', mapsUrl: 'https://maps.google.com/?q=Comoba+Lisbon', instagramUrl: 'https://www.instagram.com/comoba_lisboa/' },
+                { name: 'Heim Cafe', description: 'Popular brunch spot with great coffee and avocado toast', location: 'Rua Santos-O-Velho, Lisboa', mapsUrl: 'https://maps.google.com/?q=Heim+Cafe+Lisbon', instagramUrl: 'https://www.instagram.com/heimcafe/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'The Mill', description: 'Australian-style brunch with excellent pancakes', location: 'Rua do Poço dos Negros, Lisboa', mapsUrl: 'https://maps.google.com/?q=The+Mill+Lisbon', instagramUrl: 'https://www.instagram.com/themilllisbon/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'Dear Breakfast', description: 'Trendy brunch cafe with Instagram-worthy dishes', location: 'Rua Gaivotas, Lisboa', mapsUrl: 'https://maps.google.com/?q=Dear+Breakfast+Lisbon', instagramUrl: 'https://www.instagram.com/dearbreakfast/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'Nicolau Lisboa', description: 'Cozy brunch spot with Portuguese and international options', location: 'Rua de São Nicolau, Lisboa', mapsUrl: 'https://maps.google.com/?q=Nicolau+Lisboa', instagramUrl: 'https://www.instagram.com/nicolaulisboa/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'Fauna & Flora', description: 'Plant-based brunch with healthy options', location: 'Rua da Esperança, Lisboa', mapsUrl: 'https://maps.google.com/?q=Fauna+Flora+Lisbon', instagramUrl: 'https://www.instagram.com/faunafloracafe/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'Comoba', description: 'Modern brunch with fresh ingredients and great coffee', location: 'Rua da Rosa, Lisboa', mapsUrl: 'https://maps.google.com/?q=Comoba+Lisbon', instagramUrl: 'https://www.instagram.com/comoba_lisboa/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
               ].map((item, idx) => (
                 <div
                   key={idx}
-                  className="bg-white dark:bg-gray-900/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50"
+                  className="bg-white dark:bg-gray-900/50 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50 overflow-hidden"
                 >
-                  <h4 className="font-semibold text-base text-gray-900 dark:text-gray-50 mb-1.5">
-                    {item.name}
-                  </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
-                    {item.description}
-                  </p>
+                  {item.imageUrl && (
+                    <div className="w-full h-48 overflow-hidden">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <h4 className="font-semibold text-base text-gray-900 dark:text-gray-50 mb-1.5">
+                      {item.name}
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
+                      {item.description}
+                    </p>
                   {item.location && (
                     <div className="mb-3">
                       <a
@@ -972,12 +1100,13 @@ function HomePageInner() {
                       </div>
                     </div>
                   )}
-                  <button
-                    onClick={() => handleAddInspiration({ ...item, category: 'brunch' })}
-                    className="w-full mt-3 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
-                  >
-                    Add to activity
-                  </button>
+                    <button
+                      onClick={() => handleAddInspiration({ ...item, category: 'brunch' })}
+                      className="w-full mt-3 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
+                    >
+                      Add to activity
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -991,23 +1120,33 @@ function HomePageInner() {
             </h3>
             <div className="grid gap-4 md:grid-cols-2">
               {[
-                { name: 'Copenhagen Coffee Lab', description: 'Danish-style coffee and pastries', location: 'Multiple locations, Lisboa', mapsUrl: 'https://maps.google.com/?q=Copenhagen+Coffee+Lab+Lisbon', instagramUrl: 'https://www.instagram.com/copenhagencoffeelab/' },
-                { name: 'Fábrica Coffee Roasters', description: 'Specialty coffee with excellent breakfast options', location: 'Rua das Portas de Santo Antão, Lisboa', mapsUrl: 'https://maps.google.com/?q=Fabrica+Coffee+Roasters+Lisbon', instagramUrl: 'https://www.instagram.com/fabricacoffeeroasters/' },
-                { name: 'Café Tati', description: 'Traditional Portuguese breakfast with pastries', location: 'Rua Nova do Carvalho, Lisboa', mapsUrl: 'https://maps.google.com/?q=Cafe+Tati+Lisbon', instagramUrl: 'https://www.instagram.com/explore/tags/cafetati/' },
-                { name: 'Café Brasileira', description: 'Historic cafe with traditional Portuguese breakfast', location: 'Rua Garrett, Lisboa', mapsUrl: 'https://maps.google.com/?q=Cafe+Brasileira+Lisbon', instagramUrl: 'https://www.instagram.com/explore/locations/213385561/cafe-brasileira/' },
-                { name: 'Casa Portuguesa do Pastel de Bacalhau', description: 'Traditional cod cakes and coffee', location: 'Rua Augusta, Lisboa', mapsUrl: 'https://maps.google.com/?q=Casa+Portuguesa+do+Pastel+de+Bacalhau+Lisbon', instagramUrl: 'https://www.instagram.com/casaportuguesadopasteldebacalhau/' },
-                { name: 'Manteigaria', description: 'Fresh pastel de nata and coffee', location: 'Rua do Loreto, Lisboa', mapsUrl: 'https://maps.google.com/?q=Manteigaria+Lisbon', instagramUrl: 'https://www.instagram.com/manteigaria/' },
+                { name: 'Copenhagen Coffee Lab', description: 'Danish-style coffee and pastries', location: 'Multiple locations, Lisboa', mapsUrl: 'https://maps.google.com/?q=Copenhagen+Coffee+Lab+Lisbon', instagramUrl: 'https://www.instagram.com/copenhagencoffeelab/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'Fábrica Coffee Roasters', description: 'Specialty coffee with excellent breakfast options', location: 'Rua das Portas de Santo Antão, Lisboa', mapsUrl: 'https://maps.google.com/?q=Fabrica+Coffee+Roasters+Lisbon', instagramUrl: 'https://www.instagram.com/fabricacoffeeroasters/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'Café Tati', description: 'Traditional Portuguese breakfast with pastries', location: 'Rua Nova do Carvalho, Lisboa', mapsUrl: 'https://maps.google.com/?q=Cafe+Tati+Lisbon', instagramUrl: 'https://www.instagram.com/explore/tags/cafetati/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'Café Brasileira', description: 'Historic cafe with traditional Portuguese breakfast', location: 'Rua Garrett, Lisboa', mapsUrl: 'https://maps.google.com/?q=Cafe+Brasileira+Lisbon', instagramUrl: 'https://www.instagram.com/explore/locations/213385561/cafe-brasileira/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'Casa Portuguesa do Pastel de Bacalhau', description: 'Traditional cod cakes and coffee', location: 'Rua Augusta, Lisboa', mapsUrl: 'https://maps.google.com/?q=Casa+Portuguesa+do+Pastel+de+Bacalhau+Lisbon', instagramUrl: 'https://www.instagram.com/casaportuguesadopasteldebacalhau/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
+                { name: 'Manteigaria', description: 'Fresh pastel de nata and coffee', location: 'Rua do Loreto, Lisboa', mapsUrl: 'https://maps.google.com/?q=Manteigaria+Lisbon', instagramUrl: 'https://www.instagram.com/manteigaria/', imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop' },
               ].map((item, idx) => (
                 <div
                   key={idx}
-                  className="bg-white dark:bg-gray-900/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50"
+                  className="bg-white dark:bg-gray-900/50 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-800/50 overflow-hidden"
                 >
-                  <h4 className="font-semibold text-base text-gray-900 dark:text-gray-50 mb-1.5">
-                    {item.name}
-                  </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
-                    {item.description}
-                  </p>
+                  {item.imageUrl && (
+                    <div className="w-full h-48 overflow-hidden">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <h4 className="font-semibold text-base text-gray-900 dark:text-gray-50 mb-1.5">
+                      {item.name}
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
+                      {item.description}
+                    </p>
                   {item.location && (
                     <div className="mb-3">
                       <a
@@ -1057,12 +1196,13 @@ function HomePageInner() {
                       </div>
                     </div>
                   )}
-                  <button
-                    onClick={() => handleAddInspiration({ ...item, category: 'cafe' })}
-                    className="w-full mt-3 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
-                  >
-                    Add to activity
-                  </button>
+                    <button
+                      onClick={() => handleAddInspiration({ ...item, category: 'cafe' })}
+                      className="w-full mt-3 px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow text-sm"
+                    >
+                      Add to activity
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
