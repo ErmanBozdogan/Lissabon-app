@@ -10,7 +10,7 @@ export const runtime = 'nodejs';
 const TRIP_KEY = 'trip:default';
 
 // Default emojis for reactions
-const DEFAULT_EMOJIS = ['👍', '👎', '🔥', '🍷', '😂', '🤯'];
+const DEFAULT_EMOJIS = ['👍', '👎', '🔥', '🍷', '😂', '🤯', '😐', '😴'];
 
 export async function POST(request: NextRequest) {
   try {

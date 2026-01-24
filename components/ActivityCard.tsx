@@ -16,7 +16,7 @@ interface ActivityCardProps {
   onCommentDelete?: (activityId: string, commentId: string) => Promise<void>;
 }
 
-const DEFAULT_EMOJIS = ['👍', '👎', '🔥', '🍷', '😂', '🤯'];
+const DEFAULT_EMOJIS = ['👍', '👎', '🔥', '🍷', '😂', '🤯', '😐', '😴'];
 
 const budgetConfig: Record<string, { icons: string; label: string; color: string }> = {
   cheap: { icons: '💸', label: 'Cheap', color: 'text-green-600 dark:text-green-400' },
