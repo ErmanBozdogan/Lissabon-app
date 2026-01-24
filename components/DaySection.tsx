@@ -78,26 +78,55 @@ export default function DaySection({
 
   return (
     <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
+      <div className={`flex items-center justify-between mb-4 transition-all duration-200 ${
+        isCollapsed 
+          ? 'bg-white dark:bg-gray-900/50 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-gray-800/50 hover:shadow-md' 
+          : ''
+      }`}>
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="flex items-center gap-2 text-left"
+          className={`flex items-center gap-3 text-left flex-1 ${
+            isCollapsed ? 'group' : ''
+          }`}
         >
-          <svg
-            className={`w-5 h-5 text-gray-400 transition-transform ${isCollapsed ? '' : 'rotate-180'}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50 tracking-tight">
-            {day.label}
-          </h2>
+          <div className={`flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 ${
+            isCollapsed 
+              ? 'bg-gray-100 dark:bg-gray-800/50 group-hover:bg-gray-200 dark:group-hover:bg-gray-700' 
+              : ''
+          }`}>
+            <svg
+              className={`w-5 h-5 transition-transform duration-200 ${
+                isCollapsed 
+                  ? 'text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100' 
+                  : 'text-gray-400 rotate-180'
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h2 className={`text-lg font-semibold tracking-tight ${
+              isCollapsed 
+                ? 'text-gray-900 dark:text-gray-50' 
+                : 'text-gray-900 dark:text-gray-50'
+            }`}>
+              {day.label}
+            </h2>
+            {isCollapsed && dayActivities.length > 0 && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                {dayActivities.length} {dayActivities.length === 1 ? 'aktivitet' : 'aktiviteter'}
+              </p>
+            )}
+          </div>
         </button>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-1.5 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 text-sm font-medium py-2 px-4 rounded-xl transition-all duration-200 shadow-sm hover:shadow"
+          className={`flex items-center gap-1.5 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 text-sm font-medium py-2 px-4 rounded-xl transition-all duration-200 shadow-sm hover:shadow ${
+            isCollapsed ? 'ml-3' : ''
+          }`}
         >
           {showAddForm ? (
             <>
