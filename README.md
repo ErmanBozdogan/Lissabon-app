@@ -137,3 +137,4 @@ Currently uses a JSON file at `data/trip.json`. For production with multiple ins
 ## License
 
 Private project for Lisbon trip planning.
+<!-- test -->
